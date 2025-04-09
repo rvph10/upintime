@@ -1,6 +1,8 @@
 {
-  "name": "upintime",
+  "name": "upintown",
   "version": "0.1.0",
+  "description": "Up In Town - App Development Studio",
+  "author": "rvph",
   "private": true,
   "scripts": {
     "dev": "next dev",

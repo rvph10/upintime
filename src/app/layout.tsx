@@ -7,7 +7,7 @@ import Navigation from "../components/layout/Navigation";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "UpInTime - App Development Studio",
+  title: "Up In Town - App Development Studio",
   description:
     "Professional app development studio specializing in modern, high-performance applications.",
 };
@@ -18,7 +18,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="scroll-smooth">
+    <html lang="en" className="scroll-smoot">
       <body
         className={`${inter.className} bg-background text-primary min-h-screen`}
       >
