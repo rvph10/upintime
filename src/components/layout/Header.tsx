@@ -4,7 +4,7 @@ import Link from "next/link";
 
 function Header() {
   return (
-    <div className="flex justify-between items-center text-foreground">
+    <div className="px-12 py-8 bg-gradient-to-b from-background to-transparent backdrop-blur-sm fixed top-0 left-0 right-0 z-50 flex justify-between items-center text-foreground">
       {/* Logo */}
       <Link href="/">
         <Image

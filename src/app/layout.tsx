@@ -1,14 +1,12 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/layout/Header";
-// Initialize Inter font
-const inter = Inter({ subsets: ["latin"] });
+
 
 export const metadata: Metadata = {
-  title: "Up In Town - App Development Studio",
+  title: "Up In Town - Development Studio",
   description:
-    "Professional app development studio specializing in modern, high-performance applications.",
+    "Professional development studio specializing in modern, high-performance applications.",
 };
 
 export default function RootLayout({
@@ -17,12 +15,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="scroll-smoot">
+    <html lang="en" className="scroll-smooth">
       <body
-        className={`${inter.className} bg-background text-primary min-h-screen mx-12 my-4 font-primary`}
+        className="mx-12 my-8 bg-background text-primary min-h-screen font-primary"
       >
         <Header />
-        {children}
+        <main>{children}</main>
       </body>
     </html>
   );
