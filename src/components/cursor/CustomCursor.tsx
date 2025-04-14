@@ -1,0 +1,322 @@
+"use client";
+
+import { useState, useEffect, useRef } from "react";
+import { gsap } from "gsap";
+
+/**
+ * Type definition for element hover handlers
+ */
+interface CursorHoverHandlers {
+  enter: (e: Event) => void;
+  leave: () => void;
+}
+
+/**
+ * CustomCursor component that replaces the default cursor with a custom circle
+ * using mix-blend-mode: difference for better visibility across different backgrounds
+ * and GSAP for hover animations with magnetic effect and trailing motion
+ */
+const CustomCursor = () => {
+  const [visible, setVisible] = useState(false);
+  const [isHovering, setIsHovering] = useState(false);
+  const [cursorText, setCursorText] = useState<string>("");
+  const cursorRef = useRef<HTMLDivElement>(null);
+  const trailRef = useRef<HTMLDivElement>(null);
+  const textRef = useRef<HTMLDivElement>(null);
+  const currentHoverElement = useRef<Element | null>(null);
+  const observerRef = useRef<MutationObserver | null>(null);
+
+  /**
+   * Adds event listeners to interactive elements
+   */
+  const addInteractiveListeners = () => {
+    // Target the actual anchor elements rendered by Next.js Link components
+    const interactiveElements = document.querySelectorAll(
+      'a, button, input, select, textarea, [role="button"], [data-cursor-hover]',
+    );
+
+    const handleMouseHoverStart = (e: Event) => {
+      setIsHovering(true);
+      currentHoverElement.current = e.currentTarget as Element;
+
+      // Get cursor text from data attribute if present
+      const target = e.currentTarget as Element;
+      const text = target.getAttribute("data-cursor-text") || "";
+      setCursorText(text);
+    };
+
+    const handleMouseHoverEnd = () => {
+      setIsHovering(false);
+      currentHoverElement.current = null;
+      setCursorText("");
+    };
+
+    interactiveElements.forEach((element) => {
+      // Remove existing listeners to prevent duplicates
+      element.removeEventListener("mouseenter", handleMouseHoverStart);
+      element.removeEventListener("mouseleave", handleMouseHoverEnd);
+
+      // Add listeners
+      element.addEventListener("mouseenter", handleMouseHoverStart);
+      element.addEventListener("mouseleave", handleMouseHoverEnd);
+
+      // Store the handlers on the element for cleanup
+      (
+        element as HTMLElement & { _cursorHoverHandlers?: CursorHoverHandlers }
+      )._cursorHoverHandlers = {
+        enter: handleMouseHoverStart,
+        leave: handleMouseHoverEnd,
+      };
+    });
+  };
+
+  useEffect(() => {
+    let cursorTimeout: NodeJS.Timeout;
+
+    // Directly position cursor at exact mouse coordinates
+    const updatePosition = (e: MouseEvent) => {
+      if (!visible) setVisible(true);
+
+      // Reset timeout to hide cursor when inactive
+      clearTimeout(cursorTimeout);
+      cursorTimeout = setTimeout(() => {
+        if (visible) setVisible(false);
+      }, 5000);
+
+      if (!cursorRef.current || !trailRef.current) return;
+
+      // Apply magnetic effect if currently hovering over an element
+      if (isHovering && currentHoverElement.current) {
+        const hoverRect = currentHoverElement.current.getBoundingClientRect();
+        const hoverCenterX = hoverRect.left + hoverRect.width / 2;
+        const hoverCenterY = hoverRect.top + hoverRect.height / 2;
+
+        // Calculate distance between cursor and element center
+        const distanceX = e.clientX - hoverCenterX;
+        const distanceY = e.clientY - hoverCenterY;
+
+        // Apply magnetic pull (stronger when closer to center)
+        const magnetStrength = 0.15; // Adjust for stronger/weaker effect
+        const pullX = distanceX * magnetStrength;
+        const pullY = distanceY * magnetStrength;
+
+        // Position cursor elements directly using left/top for accuracy
+        cursorRef.current.style.left = `${e.clientX - pullX}px`;
+        cursorRef.current.style.top = `${e.clientY - pullY}px`;
+
+        // Update trail with a delay for trailing effect
+        gsap.to(trailRef.current, {
+          left: `${e.clientX - pullX}px`,
+          top: `${e.clientY - pullY}px`,
+          duration: 0.5,
+          ease: "power2.out",
+        });
+
+        // Position the text label
+        if (textRef.current) {
+          textRef.current.style.left = `${e.clientX}px`;
+          textRef.current.style.top = `${e.clientY + 30}px`;
+        }
+      } else {
+        // Direct positioning for main cursor
+        cursorRef.current.style.left = `${e.clientX}px`;
+        cursorRef.current.style.top = `${e.clientY}px`;
+
+        // Animate trail for smooth effect
+        gsap.to(trailRef.current, {
+          left: `${e.clientX}px`,
+          top: `${e.clientY}px`,
+          duration: 0.3,
+          ease: "power2.out",
+        });
+        // Position the text label
+        if (textRef.current) {
+          textRef.current.style.left = `${e.clientX}px`;
+          textRef.current.style.top = `${e.clientY + 30}px`;
+        }
+      }
+    };
+
+    // Mouse press effect
+    const handleMouseDown = () => {
+      if (cursorRef.current) {
+        gsap.to(cursorRef.current, {
+          scale: 0.85,
+          duration: 0.2,
+          ease: "power2.out",
+        });
+      }
+    };
+
+    const handleMouseUp = () => {
+      if (cursorRef.current) {
+        gsap.to(cursorRef.current, {
+          scale: 1,
+          duration: 0.2,
+          ease: "power2.out",
+        });
+      }
+    };
+
+    // Hide cursor when mouse leaves the window
+    const handleMouseLeave = () => setVisible(false);
+
+    // Show cursor when mouse enters the window
+    const handleMouseEnter = () => setVisible(true);
+
+    // Add event listeners for mouse movement
+    document.addEventListener("mousemove", updatePosition);
+    document.addEventListener("mouseleave", handleMouseLeave);
+    document.addEventListener("mouseenter", handleMouseEnter);
+    document.addEventListener("mousedown", handleMouseDown);
+    document.addEventListener("mouseup", handleMouseUp);
+
+    // Run addInteractiveListeners right after component mount and after a short delay
+    // to ensure all Next.js Link components are properly rendered
+    addInteractiveListeners();
+
+    // Run again after a short delay to catch any dynamically rendered elements
+    setTimeout(() => {
+      addInteractiveListeners();
+    }, 500);
+
+    // Setup MutationObserver to detect DOM changes
+    observerRef.current = new MutationObserver(() => {
+      addInteractiveListeners();
+    });
+
+    // Start observing the document with the configured parameters
+    observerRef.current.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: [
+        "href",
+        "role",
+        "data-cursor-hover",
+        "data-cursor-text",
+      ],
+    });
+
+    // Remove event listeners on cleanup
+    return () => {
+      clearTimeout(cursorTimeout);
+      document.removeEventListener("mousemove", updatePosition);
+      document.removeEventListener("mouseleave", handleMouseLeave);
+      document.removeEventListener("mouseenter", handleMouseEnter);
+      document.removeEventListener("mousedown", handleMouseDown);
+      document.removeEventListener("mouseup", handleMouseUp);
+
+      // Clean up all event listeners from interactive elements
+      document
+        .querySelectorAll(
+          'a, button, input, select, textarea, [role="button"], [data-cursor-hover]',
+        )
+        .forEach((element) => {
+          const typedElement = element as HTMLElement & {
+            _cursorHoverHandlers?: CursorHoverHandlers;
+          };
+          const handlers = typedElement._cursorHoverHandlers;
+          if (handlers) {
+            element.removeEventListener("mouseenter", handlers.enter);
+            element.removeEventListener("mouseleave", handlers.leave);
+            delete typedElement._cursorHoverHandlers;
+          }
+        });
+
+      // Disconnect the observer
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+    };
+  }, [visible, isHovering, cursorText]);
+
+  // GSAP animation for cursor size changes on hover
+  useEffect(() => {
+    if (!cursorRef.current || !trailRef.current) return;
+
+    // Animate main cursor size changes
+    gsap.to(cursorRef.current, {
+      width: isHovering ? "45px" : "20px",
+      height: isHovering ? "45px" : "20px",
+      marginLeft: isHovering ? "-22.5px" : "-10px",
+      marginTop: isHovering ? "-22.5px" : "-10px",
+      opacity: visible ? 1 : 0,
+      duration: 0.3,
+      ease: "power2.out",
+    });
+
+    // Animate trail cursor
+    gsap.to(trailRef.current, {
+      width: isHovering ? "15px" : "8px",
+      height: isHovering ? "15px" : "8px",
+      marginLeft: isHovering ? "-7.5px" : "-4px",
+      marginTop: isHovering ? "-7.5px" : "-4px",
+      opacity: visible ? 0.5 : 0,
+      duration: 0.3,
+      ease: "power2.out",
+    });
+
+    // Animate text visibility
+    if (textRef.current) {
+      gsap.to(textRef.current, {
+        opacity: isHovering && cursorText ? 1 : 0,
+        y: isHovering && cursorText ? 0 : 10,
+        duration: 0.3,
+        ease: "power2.out",
+      });
+    }
+  }, [isHovering, visible, cursorText]);
+
+  return (
+    <>
+      {/* Main cursor element */}
+      <div
+        ref={cursorRef}
+        className="fixed pointer-events-none z-50 rounded-full"
+        style={{
+          backgroundColor: "#fff",
+          mixBlendMode: "difference",
+          position: "fixed",
+          top: 0,
+          left: 0,
+        }}
+      />
+
+      {/* Trail cursor element */}
+      <div
+        ref={trailRef}
+        className="fixed pointer-events-none rounded-full"
+        style={{
+          backgroundColor: "#fff",
+          mixBlendMode: "difference",
+          position: "fixed",
+          top: 0,
+          left: 0,
+        }}
+      />
+
+      {/* Text label */}
+      {cursorText && (
+        <div
+          ref={textRef}
+          className="fixed pointer-events-none z-50 text-xs text-center font-semibold uppercase tracking-wider"
+          style={{
+            color: "#fff",
+            mixBlendMode: "difference",
+            position: "fixed",
+            top: 0,
+            left: 0,
+            transform: "translate(-50%, 0)",
+            whiteSpace: "nowrap",
+            opacity: 0,
+          }}
+        >
+          {cursorText}
+        </div>
+      )}
+    </>
+  );
+};
+
+export default CustomCursor;

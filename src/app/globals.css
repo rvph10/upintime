@@ -9,6 +9,11 @@
   --font-primary: "Poppins", sans-serif;
 }
 
+/* Hide default cursor */
+* {
+  cursor: none !important;
+}
+
 /* scrollbar */
 ::-webkit-scrollbar {
   width: 0px;
