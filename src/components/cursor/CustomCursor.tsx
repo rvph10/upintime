@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { gsap } from "gsap";
 
 /**
@@ -14,22 +14,70 @@ interface CursorHoverHandlers {
 /**
  * CustomCursor component that replaces the default cursor with a custom circle
  * using mix-blend-mode: difference for better visibility across different backgrounds
- * and GSAP for hover animations with magnetic effect and trailing motion
+ * and GSAP for hover animations with magnetic effect and trailing motion.
+ * Automatically disabled on touch devices.
  */
 const CustomCursor = () => {
   const [visible, setVisible] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
   const [cursorText, setCursorText] = useState<string>("");
+  const [isTouchDevice, setIsTouchDevice] = useState(true);
   const cursorRef = useRef<HTMLDivElement>(null);
   const trailRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
   const currentHoverElement = useRef<Element | null>(null);
   const observerRef = useRef<MutationObserver | null>(null);
 
+  // Check if device is touch-capable on mount
+  useEffect(() => {
+    const checkTouchDevice = () => {
+      // Check for touch capability
+      const isTouchCapable = 'ontouchstart' in window || 
+        navigator.maxTouchPoints > 0 || 
+        // Use a proper type for navigator.msMaxTouchPoints and handle possible undefined
+        ((navigator as Navigator & { msMaxTouchPoints?: number }).msMaxTouchPoints ?? 0) > 0;
+      
+      // Sometimes devices have touch capability but are being used with a mouse
+      // We can detect this by checking for mouse events
+      const isUsingMouse = window.matchMedia('(pointer: fine)').matches;
+      
+      // Set to touch device if it has touch capability and isn't being used with a mouse
+      setIsTouchDevice(isTouchCapable && !isUsingMouse);
+      
+      // If this is a touch device, remove the no-cursor styles
+      if (isTouchCapable && !isUsingMouse) {
+        // Remove the style that hides the default cursor
+        document.querySelectorAll('*').forEach(el => {
+          (el as HTMLElement).style.removeProperty('cursor');
+        });
+        
+        // Add a style tag to override the !important from the original CSS
+        const styleEl = document.createElement('style');
+        styleEl.id = 'enable-default-cursor';
+        styleEl.textContent = '* { cursor: auto !important; }';
+        document.head.appendChild(styleEl);
+      }
+    };
+    
+    checkTouchDevice();
+    
+    // Also check when window is resized, as user might switch between device modes
+    window.addEventListener('resize', checkTouchDevice);
+    
+    return () => {
+      window.removeEventListener('resize', checkTouchDevice);
+      // Clean up the style element if it exists
+      document.getElementById('enable-default-cursor')?.remove();
+    };
+  }, []);
+
   /**
    * Adds event listeners to interactive elements
    */
-  const addInteractiveListeners = () => {
+  const addInteractiveListeners = useCallback(() => {
+    // Skip if this is a touch device
+    if (isTouchDevice) return;
+    
     // Target the actual anchor elements rendered by Next.js Link components
     const interactiveElements = document.querySelectorAll(
       'a, button, input, select, textarea, [role="button"], [data-cursor-hover]',
@@ -68,9 +116,12 @@ const CustomCursor = () => {
         leave: handleMouseHoverEnd,
       };
     });
-  };
+  }, [isTouchDevice]); // Add isTouchDevice as a dependency
 
   useEffect(() => {
+    // Skip all cursor-related logic if this is a touch device
+    if (isTouchDevice) return;
+    
     let cursorTimeout: NodeJS.Timeout;
 
     // Directly position cursor at exact mouse coordinates
@@ -229,11 +280,11 @@ const CustomCursor = () => {
         observerRef.current.disconnect();
       }
     };
-  }, [visible, isHovering, cursorText]);
+  }, [visible, isHovering, cursorText, isTouchDevice, addInteractiveListeners]); // Added addInteractiveListeners
 
   // GSAP animation for cursor size changes on hover
   useEffect(() => {
-    if (!cursorRef.current || !trailRef.current) return;
+    if (isTouchDevice || !cursorRef.current || !trailRef.current) return;
 
     // Animate main cursor size changes
     gsap.to(cursorRef.current, {
@@ -266,7 +317,10 @@ const CustomCursor = () => {
         ease: "power2.out",
       });
     }
-  }, [isHovering, visible, cursorText]);
+  }, [isHovering, visible, cursorText, isTouchDevice]);
+
+  // Don't render anything if this is a touch device
+  if (isTouchDevice) return null;
 
   return (
     <>
