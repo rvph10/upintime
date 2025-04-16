@@ -18,9 +18,9 @@ const TextPreloader = () => {
 
   useEffect(() => {
     const sentences = [
-      "Finally we are here",
-      "Building digital landmarks",
-      "Welcome to Up In Town",
+      "Innovate. Create. Elevate.",
+      "Digital solutions, expertly crafted",
+      "Your vision, now UpInTown",
     ];
 
     let active = true;

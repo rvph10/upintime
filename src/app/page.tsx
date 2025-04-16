@@ -41,10 +41,10 @@ export default function Home() {
   }, [isLoading]);
 
   return (
-    <div className="w-full h-[100vh] rounded-lg overflow-hidden flex items-center justify-center">
-      <div className="w-full h-full text-center font-bold text-4xl md:text-6xl lg:text-9xl text-foreground flex flex-col items-center justify-center px-4">
+    <div className="w-full h-screen flex items-center justify-center">
+      <div className="w-full text-center font-bold text-4xl md:text-6xl lg:text-9xl text-foreground flex flex-col items-center justify-center px-4">
         <h1 ref={headingRef} className="opacity-0 transform translate-y-8">
-          Up In Town
+          UpInTown
         </h1>
         <div
           ref={subheadingRef}

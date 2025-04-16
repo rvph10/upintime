@@ -17,6 +17,10 @@ function Header() {
   const logoRef = useRef<HTMLDivElement>(null);
   const menuButtonRef = useRef<HTMLDivElement>(null);
 
+  // if mobile, set logo size to 32
+  const isMobile = window.innerWidth < 768;
+  const logoSize = isMobile ? 36 : 48;
+
   const handleOpenMenu = () => {
     setMenuOpen(true);
   };
@@ -77,7 +81,7 @@ function Header() {
   return (
     <div
       ref={headerRef}
-      className="px-4 md:px-12 py-2 md:py-8 fixed top-0 left-0 right-0 z-10 flex justify-between items-center text-foreground"
+      className="px-4 md:px-12 py-4 fixed top-0 left-0 right-0 z-10 flex justify-between items-center text-foreground"
     >
       {/* Logo */}
       <div ref={logoRef}>
@@ -90,8 +94,8 @@ function Header() {
           <Image
             src="/upintown.svg"
             alt="Up In Town Logo"
-            width={48}
-            height={48}
+            width={logoSize}
+            height={logoSize}
             priority
           />
         </Link>
@@ -100,7 +104,7 @@ function Header() {
       {/* Menu toggle button */}
       <div
         ref={menuButtonRef}
-        className="uppercase text-sm bg-foreground text-background w-16 rounded-full flex items-center justify-center h-14 font-semibold cursor-pointer transition-transform duration-300 hover:scale-110"
+        className="uppercase text-xs md:text-sm bg-foreground text-background w-12 md:w-16 rounded-full flex items-center justify-center h-10 md:h-14 font-semibold cursor-pointer transition-transform duration-300 hover:scale-110"
         onClick={handleOpenMenu}
         data-cursor-hover
         data-cursor-text="Open Menu"
