@@ -32,42 +32,44 @@ const CustomCursor = () => {
   useEffect(() => {
     const checkTouchDevice = () => {
       // Check for touch capability
-      const isTouchCapable = 'ontouchstart' in window || 
-        navigator.maxTouchPoints > 0 || 
+      const isTouchCapable =
+        "ontouchstart" in window ||
+        navigator.maxTouchPoints > 0 ||
         // Use a proper type for navigator.msMaxTouchPoints and handle possible undefined
-        ((navigator as Navigator & { msMaxTouchPoints?: number }).msMaxTouchPoints ?? 0) > 0;
-      
+        ((navigator as Navigator & { msMaxTouchPoints?: number })
+          .msMaxTouchPoints ?? 0) > 0;
+
       // Sometimes devices have touch capability but are being used with a mouse
       // We can detect this by checking for mouse events
-      const isUsingMouse = window.matchMedia('(pointer: fine)').matches;
-      
+      const isUsingMouse = window.matchMedia("(pointer: fine)").matches;
+
       // Set to touch device if it has touch capability and isn't being used with a mouse
       setIsTouchDevice(isTouchCapable && !isUsingMouse);
-      
+
       // If this is a touch device, remove the no-cursor styles
       if (isTouchCapable && !isUsingMouse) {
         // Remove the style that hides the default cursor
-        document.querySelectorAll('*').forEach(el => {
-          (el as HTMLElement).style.removeProperty('cursor');
+        document.querySelectorAll("*").forEach((el) => {
+          (el as HTMLElement).style.removeProperty("cursor");
         });
-        
+
         // Add a style tag to override the !important from the original CSS
-        const styleEl = document.createElement('style');
-        styleEl.id = 'enable-default-cursor';
-        styleEl.textContent = '* { cursor: auto !important; }';
+        const styleEl = document.createElement("style");
+        styleEl.id = "enable-default-cursor";
+        styleEl.textContent = "* { cursor: auto !important; }";
         document.head.appendChild(styleEl);
       }
     };
-    
+
     checkTouchDevice();
-    
+
     // Also check when window is resized, as user might switch between device modes
-    window.addEventListener('resize', checkTouchDevice);
-    
+    window.addEventListener("resize", checkTouchDevice);
+
     return () => {
-      window.removeEventListener('resize', checkTouchDevice);
+      window.removeEventListener("resize", checkTouchDevice);
       // Clean up the style element if it exists
-      document.getElementById('enable-default-cursor')?.remove();
+      document.getElementById("enable-default-cursor")?.remove();
     };
   }, []);
 
@@ -77,7 +79,7 @@ const CustomCursor = () => {
   const addInteractiveListeners = useCallback(() => {
     // Skip if this is a touch device
     if (isTouchDevice) return;
-    
+
     // Target the actual anchor elements rendered by Next.js Link components
     const interactiveElements = document.querySelectorAll(
       'a, button, input, select, textarea, [role="button"], [data-cursor-hover]',
@@ -121,7 +123,7 @@ const CustomCursor = () => {
   useEffect(() => {
     // Skip all cursor-related logic if this is a touch device
     if (isTouchDevice) return;
-    
+
     let cursorTimeout: NodeJS.Timeout;
 
     // Directly position cursor at exact mouse coordinates
@@ -232,7 +234,23 @@ const CustomCursor = () => {
     }, 500);
 
     // Setup MutationObserver to detect DOM changes
-    observerRef.current = new MutationObserver(() => {
+    observerRef.current = new MutationObserver((mutations) => {
+      // Check for removed nodes that were being hovered
+      mutations.forEach((mutation) => {
+        mutation.removedNodes.forEach((node) => {
+          if (
+            node instanceof Element &&
+            node.contains(currentHoverElement.current)
+          ) {
+            // Reset hover state if the removed element was being hovered
+            setIsHovering(false);
+            currentHoverElement.current = null;
+            setCursorText("");
+          }
+        });
+      });
+
+      // Add listeners to new elements
       addInteractiveListeners();
     });
 
@@ -288,22 +306,22 @@ const CustomCursor = () => {
 
     // Animate main cursor size changes
     gsap.to(cursorRef.current, {
-      width: isHovering ? "45px" : "20px",
-      height: isHovering ? "45px" : "20px",
-      marginLeft: isHovering ? "-22.5px" : "-10px",
-      marginTop: isHovering ? "-22.5px" : "-10px",
+      width: isHovering ? "60px" : "20px",
+      height: isHovering ? "60px" : "20px",
+      marginLeft: isHovering ? "-30px" : "-10px",
+      marginTop: isHovering ? "-30px" : "-10px",
       opacity: visible ? 1 : 0,
       duration: 0.3,
       ease: "power2.out",
     });
 
-    // Animate trail cursor
+    // Animate trail cursor - hide it completely when hovering
     gsap.to(trailRef.current, {
-      width: isHovering ? "15px" : "8px",
-      height: isHovering ? "15px" : "8px",
-      marginLeft: isHovering ? "-7.5px" : "-4px",
-      marginTop: isHovering ? "-7.5px" : "-4px",
-      opacity: visible ? 0.5 : 0,
+      width: isHovering ? "30px" : "8px",
+      height: isHovering ? "30px" : "8px",
+      marginLeft: isHovering ? "-15px" : "-4px",
+      marginTop: isHovering ? "-15px" : "-4px",
+      opacity: isHovering ? 0 : visible ? 0.5 : 0,
       duration: 0.3,
       ease: "power2.out",
     });
@@ -327,7 +345,7 @@ const CustomCursor = () => {
       {/* Main cursor element */}
       <div
         ref={cursorRef}
-        className="fixed pointer-events-none z-50 rounded-full"
+        className="fixed pointer-events-none z-[9999] rounded-full"
         style={{
           backgroundColor: "#fff",
           mixBlendMode: "difference",
@@ -340,7 +358,7 @@ const CustomCursor = () => {
       {/* Trail cursor element */}
       <div
         ref={trailRef}
-        className="fixed pointer-events-none rounded-full"
+        className="fixed pointer-events-none z-[9998] rounded-full"
         style={{
           backgroundColor: "#fff",
           mixBlendMode: "difference",
@@ -354,7 +372,7 @@ const CustomCursor = () => {
       {cursorText && (
         <div
           ref={textRef}
-          className="fixed pointer-events-none z-50 text-xs text-center font-semibold uppercase tracking-wider"
+          className="fixed pointer-events-none z-[9999] text-xs text-center font-semibold uppercase tracking-wider"
           style={{
             color: "#fff",
             mixBlendMode: "difference",

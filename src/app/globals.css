@@ -22,3 +22,10 @@
 ::-webkit-scrollbar-track {
   background: #ebebeb;
 }
+
+/* Mobile adjustments */
+@media (max-width: 900px) {
+  .menu-img {
+    display: none;
+  }
+}
