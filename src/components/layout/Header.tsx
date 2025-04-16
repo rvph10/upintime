@@ -7,18 +7,30 @@ import FullscreenMenu from "./FullscreenMenu";
 import { usePreloaderContext } from "@/components/preloader/PreloaderProvider";
 
 /**
+ * HeaderWrapper component that only renders the Header when the preloader is done
+ * This prevents the header from briefly appearing during preloader transitions
+ */
+export function HeaderWrapper() {
+  const { isLoading, isTransitioning } = usePreloaderContext();
+  
+  // Only render the Header when preloader is done AND transition is complete
+  if (isLoading || isTransitioning) return null;
+  
+  return <Header />;
+}
+
+/**
  * Header component with interactive navigation that indicates current page
  * Now with GSAP animations that only trigger after preloader finishes
  */
 function Header() {
-  const { isLoading } = usePreloaderContext();
   const [menuOpen, setMenuOpen] = useState(false);
   const headerRef = useRef<HTMLDivElement>(null);
   const logoRef = useRef<HTMLDivElement>(null);
   const menuButtonRef = useRef<HTMLDivElement>(null);
 
   // if mobile, set logo size to 32
-  const isMobile = window.innerWidth < 768;
+  const isMobile = typeof window !== "undefined" ? window.innerWidth < 768 : false;
   const logoSize = isMobile ? 36 : 48;
 
   const handleOpenMenu = () => {
@@ -29,9 +41,9 @@ function Header() {
     setMenuOpen(false);
   };
 
-  // GSAP animations - only trigger when loading is done
+  // GSAP animations - trigger immediately on mount
   useEffect(() => {
-    if (!isLoading && headerRef.current) {
+    if (headerRef.current) {
       // Initial state - completely transparent
       gsap.set(headerRef.current, { opacity: 0, y: -20 });
       gsap.set(logoRef.current, { opacity: 0, scale: 0.8 });
@@ -39,7 +51,7 @@ function Header() {
 
       // Create a timeline for header animations
       const headerTl = gsap.timeline({
-        delay: 1.5, // Wait for page content to animate in
+        delay: 0.1, // Just a minimal delay for smoother transition
         defaults: {
           ease: "power3.out",
         },
@@ -76,7 +88,7 @@ function Header() {
         "-=0.3",
       );
     }
-  }, [isLoading]);
+  }, []);
 
   return (
     <div

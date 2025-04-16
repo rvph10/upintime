@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Header from "@/components/layout/Header";
+import { HeaderWrapper } from "@/components/layout/Header";
 import CustomCursor from "@/components/cursor/CustomCursor";
 import { PreloaderProvider } from "@/components/preloader/PreloaderProvider";
 
@@ -20,7 +20,7 @@ export default function RootLayout({
       <body className="mx-12 my-8 bg-background text-primary min-h-screen font-primary">
         <PreloaderProvider>
           <CustomCursor />
-          <Header />
+          <HeaderWrapper />
           <main>{children}</main>
         </PreloaderProvider>
       </body>
