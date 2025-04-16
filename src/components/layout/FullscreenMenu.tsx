@@ -73,13 +73,13 @@ const FullscreenMenu = ({ isOpen, onClose }: FullscreenMenuProps) => {
       }}
     >
       {/* Close button - matches header menu button position and style */}
-      <div className="px-12 py-8 fixed top-0 left-0 right-0 flex justify-between items-center">
+      <div className="px-4 md:px-12 py-2 md:py-8 fixed top-0 left-0 right-0 flex justify-between items-center">
         <div className="invisible">
           {/* Placeholder to maintain spacing */}
-          <div className="w-12 h-12" />
+          <div className="w-12 h-11" />
         </div>
         <div
-          className="uppercase text-sm font-semibold cursor-pointer transition-transform duration-300 hover:scale-110 text-white"
+          className="uppercase bg-background text-foreground w-14 rounded-full flex items-center justify-center h-14 text-sm font-semibold cursor-pointer transition-transform duration-300 hover:scale-110"
           onClick={onClose}
           data-cursor-hover
           data-cursor-text="Close Menu"
