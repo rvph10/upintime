@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Header from "@/components/layout/Header";
 import CustomCursor from "@/components/cursor/CustomCursor";
+import { PreloaderProvider } from "@/components/preloader/PreloaderProvider";
 
 export const metadata: Metadata = {
   title: "Up In Town - Development Studio",
@@ -17,9 +18,11 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth">
       <body className="mx-12 my-8 bg-background text-primary min-h-screen font-primary">
-        <CustomCursor />
-        <Header />
-        <main>{children}</main>
+        <PreloaderProvider>
+          <CustomCursor />
+          <Header />
+          <main>{children}</main>
+        </PreloaderProvider>
       </body>
     </html>
   );

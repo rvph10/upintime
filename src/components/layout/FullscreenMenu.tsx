@@ -79,7 +79,7 @@ const FullscreenMenu = ({ isOpen, onClose }: FullscreenMenuProps) => {
           <div className="w-12 h-11" />
         </div>
         <div
-          className="uppercase bg-background text-foreground w-14 rounded-full flex items-center justify-center h-14 text-sm font-semibold cursor-pointer transition-transform duration-300 hover:scale-110"
+          className="uppercase bg-background text-foreground w-16 rounded-full flex items-center justify-center h-14 text-sm font-semibold cursor-pointer transition-transform duration-300 hover:scale-110"
           onClick={onClose}
           data-cursor-hover
           data-cursor-text="Close Menu"
