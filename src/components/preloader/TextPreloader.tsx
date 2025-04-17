@@ -24,7 +24,7 @@ const BrutalTextPreloader = () => {
 
     // Bold, impactful word sequences focused on development expertise
     const wordSequences = [
-      ["BELOW", "BEYOND", "ABOVE"],
+      // ["BELOW", "BEYOND", "ABOVE"],
       ["MAKE", "IT", "HAPPEN"],
       ["UpInTown"],
     ];
@@ -135,7 +135,7 @@ const BrutalTextPreloader = () => {
             ease: "power2.inOut",
           });
         }
-      } catch (error) {
+      } catch (error) { 
         console.error("Animation error:", error);
         if (active) setIsLoading(false);
       }
