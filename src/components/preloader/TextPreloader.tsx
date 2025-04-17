@@ -2,176 +2,134 @@
 
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { usePreloaderContext } from "./PreloaderProvider";
 
-// Register GSAP plugins
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger);
-}
-
-const TextPreloader = () => {
+const BrutalTextPreloader = () => {
   const { setIsLoading } = usePreloaderContext();
   const containerRef = useRef<HTMLDivElement>(null);
-  const wordsContainerRef = useRef<HTMLDivElement>(null);
+  const wordContainerRef = useRef<HTMLDivElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const sentences = [
-      "Innovate. Create. Elevate.",
-      "Digital solutions, expertly crafted",
-      "Your vision, now UpInTown",
+    // Animation timing constants (in seconds)
+    const TIMING = {
+      WORD_DISPLAY: 0.6, // How long each word is displayed
+      WORD_FADE_IN: 0.15, // Word entrance animation
+      WORD_FADE_OUT: 0.1, // Word exit animation
+      WORD_GAP: 0.15, // Gap between words
+      SEQUENCE_GAP: 0.3, // Gap between sequences
+      FINAL_HOLD: 0.8, // How long to hold the last word
+      FINAL_TRANSITION: 0.5, // Final overlay transition
+    };
+
+    // Bold, impactful word sequences focused on development expertise
+    const wordSequences = [
+      ["BELOW", "BEYOND", "ABOVE"],
+      ["MAKE", "IT", "HAPPEN"],
+      ["UpInTown"],
     ];
 
     let active = true;
-    const ctx = gsap.context(() => {}); // Create a GSAP context for proper cleanup
+    const ctx = gsap.context(() => {});
 
     const runAnimation = async () => {
       try {
-        // For each sentence
-        for (let i = 0; i < sentences.length; i++) {
+        // For each word sequence
+        for (let i = 0; i < wordSequences.length; i++) {
           if (!active) return;
-
-          const words = sentences[i].split(" ");
+          const words = wordSequences[i];
+          const isLastSequence = i === wordSequences.length - 1;
 
           // Clear the container
-          if (wordsContainerRef.current) {
-            wordsContainerRef.current.innerHTML = "";
+          if (wordContainerRef.current) {
+            wordContainerRef.current.innerHTML = "";
 
-            // Create a wrapper for better word spacing
-            const sentenceWrapper = document.createElement("div");
-            sentenceWrapper.className =
-              "flex flex-wrap justify-center items-center gap-2 sm:gap-3 md:gap-4";
-            wordsContainerRef.current.appendChild(sentenceWrapper);
+            // Create word element but keep it hidden initially
+            const wordElement = document.createElement("div");
+            wordElement.className =
+              "font-bold tracking-tight transform scale-100";
+            wordContainerRef.current.appendChild(wordElement);
 
-            // Create word containers first without animation
-            const wordContainers: HTMLDivElement[] = [];
-            const letterElements: HTMLSpanElement[][] = [];
-
-            // Create all word containers
+            // Display each word with a "brutal" animation
             for (let j = 0; j < words.length; j++) {
-              // Create word container for proper spacing
-              const wordContainer = document.createElement("div");
-              wordContainer.className = "word-container relative";
-              sentenceWrapper.appendChild(wordContainer);
-              wordContainers.push(wordContainer);
-
-              // Split word into letters
-              const letters = words[j].split("");
-              const wordLetters: HTMLSpanElement[] = [];
-
-              // Create letter spans but don't animate yet
-              letters.forEach((letter) => {
-                const letterSpan = document.createElement("span");
-                letterSpan.textContent = letter;
-                letterSpan.className = "letter-span inline-block opacity-0";
-                letterSpan.style.transform = "translateY(20px) rotateY(45deg)";
-                letterSpan.style.filter = "blur(5px)";
-                wordContainer.appendChild(letterSpan);
-                wordLetters.push(letterSpan);
-              });
-
-              letterElements.push(wordLetters);
-            }
-
-            // Now animate each word sequentially
-            for (let j = 0; j < wordContainers.length; j++) {
               if (!active) return;
+              const isLastWord = j === words.length - 1;
 
-              // Choose a random animation style for this word
-              const animStyle = Math.floor(Math.random() * 3);
+              // Set the word text
+              wordElement.textContent = words[j];
 
-              // Animate each letter in the word
-              gsap.to(letterElements[j], {
-                opacity: 1,
+              // Reset styles for new word
+              gsap.set(wordElement, {
+                opacity: 0,
+                scale: 1.2,
                 y: 0,
-                rotationY: 0,
-                filter: "blur(0px)",
-                stagger: 0.04, // Stagger the letters
-                duration: 0.5,
-                ease: "power2.out",
-                delay: animStyle === 0 ? 0 : 0.1, // Small variation
               });
 
-              // Add a subtle float animation to the word container
-              if (animStyle === 1) {
-                // Subtle float for some words
-                gsap.fromTo(
-                  wordContainers[j],
-                  { y: 10 },
-                  { y: 0, duration: 0.6, ease: "back.out(1.2)" },
-                );
-              } else if (animStyle === 2) {
-                // Small scale effect for some words
-                gsap.fromTo(
-                  wordContainers[j],
-                  { scale: 0.9 },
-                  { scale: 1, duration: 0.6, ease: "elastic.out(1, 0.5)" },
+              // Brutal entrance - quick, high impact
+              gsap.to(wordElement, {
+                opacity: 1,
+                scale: 1,
+                duration: TIMING.WORD_FADE_IN,
+                ease: "power1.out",
+              });
+
+              // Hold word
+              await new Promise((resolve) =>
+                setTimeout(resolve, TIMING.WORD_DISPLAY * 1000),
+              );
+
+              // Brutal exit - quick cut (unless it's the last word of the sequence)
+              if (!isLastWord) {
+                gsap.to(wordElement, {
+                  opacity: 0,
+                  scale: 0.9,
+                  duration: TIMING.WORD_FADE_OUT,
+                  ease: "power1.in",
+                });
+
+                // Brief pause between words
+                await new Promise((resolve) =>
+                  setTimeout(resolve, TIMING.WORD_GAP * 1000),
                 );
               }
+            }
 
-              // Wait before next word
+            // Hold the last word longer
+            await new Promise((resolve) =>
+              setTimeout(resolve, TIMING.FINAL_HOLD * 1000),
+            );
+
+            // Clear for next sequence unless it's the last sequence
+            if (!isLastSequence) {
+              gsap.to(wordElement, {
+                opacity: 0,
+                duration: TIMING.WORD_FADE_OUT,
+              });
+
               await new Promise((resolve) =>
-                setTimeout(resolve, 120 + animStyle * 30),
+                setTimeout(resolve, TIMING.SEQUENCE_GAP * 1000),
               );
             }
           }
-
-          // Pause at the end of sentence
-          await new Promise((resolve) => setTimeout(resolve, 1200));
-
-          // Don't animate out the last sentence
-          if (i < sentences.length - 1) {
-            // Get all letter spans in current sentence
-            const allLetters = Array.from(
-              wordsContainerRef.current?.querySelectorAll(".letter-span") || [],
-            );
-
-            // Animate letters out with staggered blur effect
-            gsap.to(allLetters, {
-              opacity: 0,
-              y: -10,
-              filter: "blur(5px)",
-              stagger: {
-                from: "random", // Random starting point
-                amount: 0.4, // Total stagger duration
-              },
-              duration: 0.4,
-            });
-
-            // Wait for exit animation
-            await new Promise((resolve) => setTimeout(resolve, 600));
-          }
         }
 
-        // Final transition - corridor effect
+        // Final brutal transition
         if (containerRef.current && overlayRef.current && active) {
-          // First fade out the text with a staggered letter effect
-          const allFinalLetters = Array.from(
-            wordsContainerRef.current?.querySelectorAll(".letter-span") || [],
-          );
-
-          gsap.to(allFinalLetters, {
+          // Hard cut transition at the end
+          gsap.to(wordContainerRef.current, {
             opacity: 0,
-            y: -15,
-            rotationX: 45,
-            filter: "blur(8px)",
-            stagger: {
-              from: "center",
-              amount: 0.6,
-            },
-            duration: 0.6,
-            ease: "power2.in",
+            duration: TIMING.WORD_FADE_OUT,
           });
 
-          // Wait for text to fade out
-          await new Promise((resolve) => setTimeout(resolve, 800));
+          await new Promise((resolve) =>
+            setTimeout(resolve, TIMING.SEQUENCE_GAP * 1000),
+          );
 
-          // Then animate the corridor effect
+          // Final overlay transition - brutal slides
           gsap.to(overlayRef.current, {
             clipPath: "polygon(0% 0%, 100% 0%, 100% 0%, 0% 0%)",
-            duration: 1.25,
-            ease: "power4.inOut",
+            duration: TIMING.FINAL_TRANSITION,
+            ease: "power2.inOut",
             onComplete: () => {
               if (active) {
                 // Animation complete, notify the app
@@ -189,10 +147,22 @@ const TextPreloader = () => {
     // Start the animation
     runAnimation();
 
-    // Fallback timeout
-    const fallbackTimeout = setTimeout(() => {
-      if (active) setIsLoading(false);
-    }, 10000);
+    // Calculate total animation duration for fallback timeout
+    const totalWords = wordSequences.reduce((sum, seq) => sum + seq.length, 0);
+    const estimatedDuration =
+      totalWords *
+        (TIMING.WORD_DISPLAY + TIMING.WORD_FADE_IN + TIMING.WORD_GAP) +
+      (wordSequences.length - 1) * TIMING.SEQUENCE_GAP +
+      TIMING.FINAL_HOLD +
+      TIMING.FINAL_TRANSITION;
+
+    // Add 1 second buffer to estimated duration
+    const fallbackTimeout = setTimeout(
+      () => {
+        if (active) setIsLoading(false);
+      },
+      (estimatedDuration + 1) * 1000,
+    );
 
     return () => {
       active = false;
@@ -212,14 +182,14 @@ const TextPreloader = () => {
     >
       <div
         ref={containerRef}
-        className="fixed inset-0 flex items-center justify-center p-4 sm:p-6 md:p-8"
+        className="fixed inset-0 flex items-center justify-center p-4"
       >
-        <div className="text-xl sm:text-3xl md:text-5xl lg:text-7xl font-bold text-background w-full max-w-[90vw] md:max-w-4xl text-center">
-          <div ref={wordsContainerRef} className="min-h-[1.2em]"></div>
+        <div className="text-4xl sm:text-5xl md:text-7xl lg:text-9xl font-black text-white w-full max-w-[90vw] text-center">
+          <div ref={wordContainerRef} className="min-h-[1.2em]"></div>
         </div>
       </div>
     </div>
   );
 };
 
-export default TextPreloader;
+export default BrutalTextPreloader;

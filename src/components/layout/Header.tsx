@@ -11,11 +11,21 @@ import { usePreloaderContext } from "@/components/preloader/PreloaderProvider";
  * This prevents the header from briefly appearing during preloader transitions
  */
 export function HeaderWrapper() {
-  const { isLoading, isTransitioning } = usePreloaderContext();
-  
-  // Only render the Header when preloader is done AND transition is complete
-  if (isLoading || isTransitioning) return null;
-  
+  const { isLoading } = usePreloaderContext();
+  const [shouldRender, setShouldRender] = useState(false);
+
+  useEffect(() => {
+    if (!isLoading) {
+      // Small delay to ensure preloader transition is complete
+      const timer = setTimeout(() => {
+        setShouldRender(true);
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [isLoading]);
+
+  if (!shouldRender) return null;
+
   return <Header />;
 }
 
@@ -28,9 +38,11 @@ function Header() {
   const headerRef = useRef<HTMLDivElement>(null);
   const logoRef = useRef<HTMLDivElement>(null);
   const menuButtonRef = useRef<HTMLDivElement>(null);
+  const hasAnimated = useRef(false);
 
   // if mobile, set logo size to 32
-  const isMobile = typeof window !== "undefined" ? window.innerWidth < 768 : false;
+  const isMobile =
+    typeof window !== "undefined" ? window.innerWidth < 768 : false;
   const logoSize = isMobile ? 36 : 48;
 
   const handleOpenMenu = () => {
@@ -43,15 +55,17 @@ function Header() {
 
   // GSAP animations - trigger immediately on mount
   useEffect(() => {
-    if (headerRef.current) {
+    if (headerRef.current && !hasAnimated.current) {
+      hasAnimated.current = true;
+
       // Initial state - completely transparent
       gsap.set(headerRef.current, { opacity: 0, y: -20 });
       gsap.set(logoRef.current, { opacity: 0, scale: 0.8 });
       gsap.set(menuButtonRef.current, { opacity: 0, scale: 0.8 });
 
-      // Create a timeline for header animations
+      // Create a timeline for header animations with a delay to match preloader transition
       const headerTl = gsap.timeline({
-        delay: 0.1, // Just a minimal delay for smoother transition
+        delay: 0.1, // Reduced delay since we're now properly handling mounting
         defaults: {
           ease: "power3.out",
         },
@@ -61,7 +75,7 @@ function Header() {
       headerTl.to(headerRef.current, {
         opacity: 1,
         y: 0,
-        duration: 0.6,
+        duration: 0.8,
       });
 
       // Then logo with a slight bounce
@@ -70,10 +84,10 @@ function Header() {
         {
           opacity: 1,
           scale: 1,
-          duration: 0.5,
+          duration: 0.6,
           ease: "back.out(1.7)",
         },
-        "-=0.3",
+        "-=0.4", // Slightly overlap with header animation
       );
 
       // Then menu button with slight delay
@@ -82,10 +96,10 @@ function Header() {
         {
           opacity: 1,
           scale: 1,
-          duration: 0.5,
+          duration: 0.6,
           ease: "back.out(1.7)",
         },
-        "-=0.3",
+        "-=0.4", // Slightly overlap with logo animation
       );
     }
   }, []);
@@ -93,10 +107,10 @@ function Header() {
   return (
     <div
       ref={headerRef}
-      className="px-4 md:px-12 py-4 fixed top-0 left-0 right-0 z-10 flex justify-between items-center text-foreground"
+      className="px-4 md:px-12 py-4 fixed top-0 left-0 right-0 z-10 flex justify-between items-center text-foreground opacity-0"
     >
       {/* Logo */}
-      <div ref={logoRef}>
+      <div ref={logoRef} className="opacity-0">
         <Link
           href="/"
           data-cursor-hover
@@ -116,7 +130,7 @@ function Header() {
       {/* Menu toggle button */}
       <div
         ref={menuButtonRef}
-        className="uppercase text-xs md:text-sm bg-foreground text-background w-12 md:w-16 rounded-full flex items-center justify-center h-10 md:h-14 font-semibold cursor-pointer transition-transform duration-300 hover:scale-110"
+        className="uppercase text-xs md:text-sm bg-foreground text-background w-12 md:w-16 rounded-full flex items-center justify-center h-10 md:h-14 font-semibold cursor-pointer transition-transform duration-300 hover:scale-110 opacity-0"
         onClick={handleOpenMenu}
         data-cursor-hover
         data-cursor-text="Open Menu"
