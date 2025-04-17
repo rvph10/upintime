@@ -115,17 +115,7 @@ const BrutalTextPreloader = () => {
 
         // Final brutal transition
         if (containerRef.current && overlayRef.current && active) {
-          // Hard cut transition at the end
-          gsap.to(wordContainerRef.current, {
-            opacity: 0,
-            duration: TIMING.WORD_FADE_OUT,
-          });
-
-          await new Promise((resolve) =>
-            setTimeout(resolve, TIMING.SEQUENCE_GAP * 1000),
-          );
-
-          // Final overlay transition - brutal slides
+          // For the final transition, keep the last word visible and fade it out together with the overlay
           gsap.to(overlayRef.current, {
             clipPath: "polygon(0% 0%, 100% 0%, 100% 0%, 0% 0%)",
             duration: TIMING.FINAL_TRANSITION,
@@ -136,6 +126,13 @@ const BrutalTextPreloader = () => {
                 setIsLoading(false);
               }
             },
+          });
+
+          // Fade out the word container at the same time as the overlay transition
+          gsap.to(wordContainerRef.current, {
+            opacity: 0,
+            duration: TIMING.FINAL_TRANSITION,
+            ease: "power2.inOut",
           });
         }
       } catch (error) {
@@ -182,10 +179,12 @@ const BrutalTextPreloader = () => {
     >
       <div
         ref={containerRef}
-        className="fixed inset-0 flex items-center justify-center p-4"
+        className="fixed inset-0 flex items-center justify-center"
       >
-        <div className="text-4xl sm:text-5xl md:text-7xl lg:text-9xl font-black text-white w-full max-w-[90vw] text-center">
-          <div ref={wordContainerRef} className="min-h-[1.2em]"></div>
+        <div className="w-full h-screen flex items-center justify-center">
+          <div className="text-4xl sm:text-5xl md:text-7xl lg:text-9xl font-black text-white w-full max-w-[90vw] text-center">
+            <div ref={wordContainerRef} className="min-h-[1.2em]"></div>
+          </div>
         </div>
       </div>
     </div>
