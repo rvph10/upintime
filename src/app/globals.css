@@ -2,8 +2,8 @@
 
 @theme {
   --color-background: #ebebeb;
-  --color-background-secondary: #000000;
-  --color-foreground: #000000;
+  --color-background-secondary: #1b1b1a;
+  --color-foreground: #1b1b1a;
   --color-foreground-secondary: #ebebeb;
 
   --font-primary: "Poppins", sans-serif;

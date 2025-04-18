@@ -32,6 +32,7 @@ export function HeaderWrapper() {
 /**
  * Header component with interactive navigation that indicates current page
  * Now with GSAP animations that only trigger after preloader finishes
+ * Features mix-blend-mode: difference for visual contrast against backgrounds
  */
 function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -105,42 +106,44 @@ function Header() {
   }, []);
 
   return (
-    <div
-      ref={headerRef}
-      className="px-4 md:px-12 py-4 fixed top-0 left-0 right-0 z-10 flex justify-between items-center text-foreground opacity-0"
-    >
-      {/* Logo */}
-      <div ref={logoRef} className="opacity-0">
-        <Link
-          href="/"
-          data-cursor-hover
-          data-cursor-text="Home"
-          className="transition-transform duration-300 hover:scale-110 block"
-        >
-          <Image
-            src="/upintown.svg"
-            alt="Up In Town Logo"
-            width={logoSize}
-            height={logoSize}
-            priority
-          />
-        </Link>
-      </div>
-
-      {/* Menu toggle button */}
+    <>
       <div
-        ref={menuButtonRef}
-        className="uppercase text-xs md:text-sm bg-foreground text-background w-12 md:w-16 rounded-full flex items-center justify-center h-10 md:h-14 font-semibold cursor-pointer transition-transform duration-300 hover:scale-110 opacity-0"
-        onClick={handleOpenMenu}
-        data-cursor-hover
-        data-cursor-text="Open Menu"
+        ref={headerRef}
+        className="px-4 md:px-12 py-4 fixed top-0 left-0 right-0 z-[200] flex justify-between items-center text-foreground opacity-0 mix-blend-difference"
       >
-        Menu
+        {/* Logo */}
+        <div ref={logoRef} className="opacity-0 relative z-[201]">
+          <Link
+            href="/"
+            data-cursor-hover
+            data-cursor-text="Home"
+            className="transition-transform duration-300 hover:scale-110 block"
+          >
+            <Image
+              src="/upintown-white.svg"
+              alt="Up In Town Logo"
+              width={logoSize}
+              height={logoSize}
+              priority
+            />
+          </Link>
+        </div>
+
+        {/* Menu toggle button */}
+        <div
+          ref={menuButtonRef}
+          className="uppercase text-xs md:text-sm bg-white text-foreground w-12 md:w-16 rounded-full flex items-center justify-center h-10 md:h-14 font-semibold cursor-pointer transition-transform duration-300 hover:scale-110 opacity-0 relative z-[201]"
+          onClick={menuOpen ? handleCloseMenu : handleOpenMenu}
+          data-cursor-hover
+          data-cursor-text={menuOpen ? "Close Menu" : "Open Menu"}
+        >
+          {menuOpen ? "Close" : "Menu"}
+        </div>
       </div>
 
-      {/* Fullscreen Menu Component */}
-      <FullscreenMenu isOpen={menuOpen} onClose={handleCloseMenu} />
-    </div>
+      {/* Fullscreen Menu Component - moved outside header div */}
+      <FullscreenMenu isOpen={menuOpen} />
+    </>
   );
 }
 
