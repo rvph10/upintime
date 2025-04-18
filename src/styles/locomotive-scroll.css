@@ -1,0 +1,74 @@
+/*
+ * Custom styles for Locomotive Scroll
+ */
+
+/* Hide scrollbar for Locomotive Scroll */
+html.has-scroll-smooth {
+  overflow: hidden;
+}
+
+html.has-scroll-dragging {
+  user-select: none;
+}
+
+/* The container element that will be smoothly scrolled */
+.has-scroll-smooth body {
+  overflow: hidden;
+}
+
+/* Additional cursor styles for drag scrolling */
+.has-scroll-dragging [data-scroll-container] {
+  cursor: grabbing !important;
+}
+
+/* Custom scroll appearance */
+[data-scroll-direction="horizontal"] [data-scroll-container] {
+  height: 100vh;
+  display: inline-block;
+  white-space: nowrap;
+}
+
+[data-scroll-direction="horizontal"] [data-scroll-section] {
+  display: inline-block;
+  vertical-align: top;
+  white-space: nowrap;
+  height: 100%;
+}
+
+/* Animation classes that can be added to elements */
+.fade-in-up {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 1s ease, transform 1s ease;
+}
+
+.fade-in-up.is-inview {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.fade-in {
+  opacity: 0;
+  transition: opacity 1s ease;
+}
+
+.fade-in.is-inview {
+  opacity: 1;
+}
+
+/* Parallax effects */
+[data-scroll-speed] {
+  will-change: transform;
+}
+
+[data-scroll-call="toggleActive"].is-inview {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+[data-scroll-call="toggleActive"] {
+  opacity: 0;
+  transform: translateY(50px);
+  transition: opacity 0.6s cubic-bezier(0.215, 0.61, 0.355, 1),
+              transform 0.6s cubic-bezier(0.215, 0.61, 0.355, 1);
+} 

@@ -135,7 +135,7 @@ const BrutalTextPreloader = () => {
             ease: "power2.inOut",
           });
         }
-      } catch (error) { 
+      } catch (error) {
         console.error("Animation error:", error);
         if (active) setIsLoading(false);
       }

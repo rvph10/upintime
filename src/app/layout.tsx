@@ -19,7 +19,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="scroll-smooth">
-      <body className="mx-12 mt-8 bg-background text-primary min-h-screen font-primary">
+      <body className="mx-12 mt-8 bg-background text-primary min-h-screen font-primary flex flex-col overflow-x-hidden">
         <PreloaderProvider>
           <CustomCursor />
           <HeaderWrapper />
