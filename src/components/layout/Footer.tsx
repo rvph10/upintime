@@ -189,7 +189,7 @@ const Footer = () => {
     <footer className="relative -mx-12 bottom-0 px-16 sm:px-8 xs:px-6 py-12 sm:py-8 left-0 right-0 bg-foreground text-background">
       <div className="max-w-7xl mx-auto flex flex-col justify-center">
         {/* Upper section */}
-        <div className="flex flex-col md:flex-row justify-between items-start gap-12 mb-16 sm:mb-10">
+        <div className="flex flex-col md:flex-row justify-between items-start gap-12 mb-6 md:mb-16 sm:mb-10">
           {/* Left column */}
           <div className="flex flex-col gap-6 max-w-xl w-full">
             <h2
@@ -222,6 +222,7 @@ const Footer = () => {
                     required
                     disabled={isLoading}
                     data-cursor-hover
+                    data-cursor-type="text"
                   />
                   <button
                     type="submit"
@@ -234,6 +235,7 @@ const Footer = () => {
                     }`}
                     disabled={isLoading || !!validationError}
                     data-cursor-hover
+                    data-cursor-type="button"
                     data-cursor-text={
                       isLoading ? "Subscribing..." : "Subscribe"
                     }
@@ -276,6 +278,7 @@ const Footer = () => {
                 href="/"
                 className="hover:opacity-70 transition-opacity"
                 data-cursor-hover
+                data-cursor-type="link"
               >
                 Home
               </Link>
@@ -283,6 +286,7 @@ const Footer = () => {
                 href="/projects"
                 className="hover:opacity-70 transition-opacity"
                 data-cursor-hover
+                data-cursor-type="link"
               >
                 Projects
               </Link>
@@ -290,6 +294,7 @@ const Footer = () => {
                 href="/about"
                 className="hover:opacity-70 transition-opacity"
                 data-cursor-hover
+                data-cursor-type="link"
               >
                 About
               </Link>
@@ -297,6 +302,7 @@ const Footer = () => {
                 href="/contact"
                 className="hover:opacity-70 transition-opacity"
                 data-cursor-hover
+                data-cursor-type="link"
               >
                 Contact
               </Link>
@@ -313,6 +319,7 @@ const Footer = () => {
                 rel="noopener noreferrer"
                 className="hover:opacity-70 transition-opacity flex items-center"
                 data-cursor-hover
+                data-cursor-type="link"
               >
                 Instagram <span className="ml-1">↗</span>
               </a>
@@ -322,6 +329,7 @@ const Footer = () => {
                 rel="noopener noreferrer"
                 className="hover:opacity-70 transition-opacity flex items-center"
                 data-cursor-hover
+                data-cursor-type="link"
               >
                 Github <span className="ml-1">↗</span>
               </a>
@@ -331,6 +339,7 @@ const Footer = () => {
                 rel="noopener noreferrer"
                 className="hover:opacity-70 transition-opacity flex items-center"
                 data-cursor-hover
+                data-cursor-type="link"
               >
                 LinkedIn <span className="ml-1">↗</span>
               </a>
@@ -345,6 +354,7 @@ const Footer = () => {
                 href="mailto:contact@upintown.dev"
                 className="hover:opacity-70 transition-opacity"
                 data-cursor-hover
+                data-cursor-type="link"
               >
                 contact@upintown.dev
               </a>
@@ -353,8 +363,8 @@ const Footer = () => {
         </div>
 
         {/* Bottom section with animated logo and copyright */}
-        <div className="flex flex-col mt-4">
-          <div className="overflow-hidden py-6 w-full flex items-center justify-center">
+        <div className="flex flex-col md:mt-4">
+          <div className="overflow-hidden md:py-6 w-full flex items-center justify-center">
             {/* SimplifiedAnimatedLogo component */}
             <SimpleAnimatedLogo />
           </div>

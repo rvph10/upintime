@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
+import Link from "next/link";
 
 /**
  * FullscreenMenu Component
@@ -21,7 +22,6 @@ const FullscreenMenu = ({ isOpen }: FullscreenMenuProps) => {
   // Initialize GSAP animations and handle open/close
   useEffect(() => {
     const defaultEase = "power4.inOut";
-
     // Function to open menu
     const openMenu = () => {
       gsap.to(menuRef.current, {
@@ -65,11 +65,48 @@ const FullscreenMenu = ({ isOpen }: FullscreenMenuProps) => {
   return (
     <div
       ref={menuRef}
-      className="menu fixed top-0 left-0 w-screen h-screen bg-background-secondary z-50 pointer-events-none overflow-hidden pt-20"
+      className="menu fixed top-0 left-0 w-screen h-screen md:px-38 md:py-36 bg-background-secondary z-50 pointer-events-none overflow-hidden pt-20"
       style={{
         clipPath: "polygon(0% 100%, 100% 100%, 100% 100%, 0% 100%)",
       }}
-    ></div>
+    >
+      <div className="h-full w-full flex justify-items-start items-center">
+        <div className="flex flex-col gap-12 text-[130px] leading-none uppercase text-foreground-secondary">
+          <Link
+            href="/"
+            className="w-fit"
+            data-cursor-type="link"
+            data-animate="font-weight"
+          >
+            Home
+          </Link>
+          <Link
+            href="/about"
+            className="w-fit"
+            data-cursor-type="link"
+            data-animate="font-weight"
+          >
+            About
+          </Link>
+          <Link
+            href="/services"
+            className="w-fit"
+            data-cursor-type="link"
+            data-animate="font-weight"
+          >
+            Services
+          </Link>
+          <Link
+            href="/contact"
+            className="w-fit"
+            data-cursor-type="link"
+            data-animate="font-weight"
+          >
+            Contact
+          </Link>
+        </div>
+      </div>
+    </div>
   );
 };
 

@@ -117,6 +117,7 @@ function Header() {
             href="/"
             data-cursor-hover
             data-cursor-text="Home"
+            data-cursor-type="link"
             className="transition-transform duration-300 hover:scale-110 block"
           >
             <Image
@@ -136,6 +137,7 @@ function Header() {
           onClick={menuOpen ? handleCloseMenu : handleOpenMenu}
           data-cursor-hover
           data-cursor-text={menuOpen ? "Close Menu" : "Open Menu"}
+          data-cursor-type="button"
         >
           {menuOpen ? "Close" : "Menu"}
         </div>

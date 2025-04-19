@@ -1,7 +1,60 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  createContext,
+  useContext,
+  ReactNode,
+} from "react";
 import { gsap } from "gsap";
+
+/**
+ * Type definition for cursor context
+ */
+interface CursorContextType {
+  setCursorType: (type: CursorType) => void;
+  setCursorText: (text: string) => void;
+}
+
+/**
+ * Available cursor types
+ */
+type CursorType =
+  | "default"
+  | "text"
+  | "link"
+  | "button"
+  | "draggable"
+  | "custom";
+
+// Create context with default values
+const CursorContext = createContext<CursorContextType>({
+  setCursorType: () => {},
+  setCursorText: () => {},
+});
+
+/**
+ * Custom hook to use cursor context
+ */
+export const useCursor = () => useContext(CursorContext);
+
+/**
+ * CursorProvider component to wrap application
+ */
+export const CursorProvider = ({ children }: { children: ReactNode }) => {
+  const [cursorType, setCursorType] = useState<CursorType>("default");
+  const [cursorText, setCursorText] = useState<string>("");
+
+  return (
+    <CursorContext.Provider value={{ setCursorType, setCursorText }}>
+      {children}
+      <CustomCursor cursorType={cursorType} initialCursorText={cursorText} />
+    </CursorContext.Provider>
+  );
+};
 
 /**
  * Type definition for element hover handlers
@@ -12,21 +65,38 @@ interface CursorHoverHandlers {
 }
 
 /**
+ * CustomCursor props
+ */
+interface CustomCursorProps {
+  cursorType?: CursorType;
+  initialCursorText?: string;
+}
+
+/**
  * CustomCursor component that replaces the default cursor with a custom circle
  * using mix-blend-mode: difference for better visibility across different backgrounds
  * and GSAP for hover animations with magnetic effect and trailing motion.
  * Automatically disabled on touch devices.
  */
-const CustomCursor = () => {
+const CustomCursor = ({
+  cursorType = "default",
+  initialCursorText = "",
+}: CustomCursorProps) => {
   const [visible, setVisible] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
-  const [cursorText, setCursorText] = useState<string>("");
+  const [cursorText, setCursorText] = useState<string>(initialCursorText);
   const [isTouchDevice, setIsTouchDevice] = useState(true);
+  const [isClicking, setIsClicking] = useState(false);
   const cursorRef = useRef<HTMLDivElement>(null);
   const trailRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
   const currentHoverElement = useRef<Element | null>(null);
   const observerRef = useRef<MutationObserver | null>(null);
+
+  // Update cursor text when prop changes
+  useEffect(() => {
+    setCursorText(initialCursorText);
+  }, [initialCursorText]);
 
   // Check if device is touch-capable on mount
   useEffect(() => {
@@ -93,12 +163,46 @@ const CustomCursor = () => {
       const target = e.currentTarget as Element;
       const text = target.getAttribute("data-cursor-text") || "";
       setCursorText(text);
+
+      // Get cursor type from data attribute if present
+      const type = target.getAttribute("data-cursor-type") as CursorType | null;
+      if (type) {
+        // Apply specific cursor styles based on type
+        if (cursorRef.current) {
+          switch (type) {
+            case "button":
+              cursorRef.current.classList.add("cursor-button");
+              break;
+            case "link":
+              cursorRef.current.classList.add("cursor-link");
+              break;
+            case "text":
+              cursorRef.current.classList.add("cursor-text");
+              break;
+            case "draggable":
+              cursorRef.current.classList.add("cursor-draggable");
+              break;
+            default:
+              break;
+          }
+        }
+      }
     };
 
     const handleMouseHoverEnd = () => {
       setIsHovering(false);
       currentHoverElement.current = null;
       setCursorText("");
+
+      // Remove all cursor type classes
+      if (cursorRef.current) {
+        cursorRef.current.classList.remove(
+          "cursor-button",
+          "cursor-link",
+          "cursor-text",
+          "cursor-draggable",
+        );
+      }
     };
 
     interactiveElements.forEach((element) => {
@@ -148,10 +252,26 @@ const CustomCursor = () => {
         const distanceX = e.clientX - hoverCenterX;
         const distanceY = e.clientY - hoverCenterY;
 
-        // Apply magnetic pull (stronger when closer to center)
-        const magnetStrength = 0.15; // Adjust for stronger/weaker effect
-        const pullX = distanceX * magnetStrength;
-        const pullY = distanceY * magnetStrength;
+        // Calculate the element's size factor (larger elements need less magnetic pull)
+        const elementSize = Math.max(hoverRect.width, hoverRect.height);
+        const sizeFactor = Math.min(1, 100 / elementSize); // Reduce effect as element size increases
+
+        // Limit the maximum distance for magnetic effect
+        const maxDistance = 100;
+        const normalizedDistanceX =
+          Math.abs(distanceX) > maxDistance
+            ? (distanceX / Math.abs(distanceX)) * maxDistance
+            : distanceX;
+        const normalizedDistanceY =
+          Math.abs(distanceY) > maxDistance
+            ? (distanceY / Math.abs(distanceY)) * maxDistance
+            : distanceY;
+
+        // Apply magnetic pull with size adjustment (stronger when closer to center, weaker for larger elements)
+        const baseStrength = 0.15; // Base magnetic strength
+        const magnetStrength = baseStrength * sizeFactor;
+        const pullX = normalizedDistanceX * magnetStrength;
+        const pullY = normalizedDistanceY * magnetStrength;
 
         // Position cursor elements directly using left/top for accuracy
         cursorRef.current.style.left = `${e.clientX - pullX}px`;
@@ -182,6 +302,7 @@ const CustomCursor = () => {
           duration: 0.3,
           ease: "power2.out",
         });
+
         // Position the text label
         if (textRef.current) {
           textRef.current.style.left = `${e.clientX}px`;
@@ -192,6 +313,7 @@ const CustomCursor = () => {
 
     // Mouse press effect
     const handleMouseDown = () => {
+      setIsClicking(true);
       if (cursorRef.current) {
         gsap.to(cursorRef.current, {
           scale: 0.85,
@@ -202,6 +324,7 @@ const CustomCursor = () => {
     };
 
     const handleMouseUp = () => {
+      setIsClicking(false);
       if (cursorRef.current) {
         gsap.to(cursorRef.current, {
           scale: 1,
@@ -264,6 +387,7 @@ const CustomCursor = () => {
         "role",
         "data-cursor-hover",
         "data-cursor-text",
+        "data-cursor-type",
       ],
     });
 
@@ -304,12 +428,73 @@ const CustomCursor = () => {
   useEffect(() => {
     if (isTouchDevice || !cursorRef.current || !trailRef.current) return;
 
+    // Get cursor style based on cursorType
+    const getCursorStyle = () => {
+      switch (cursorType) {
+        case "button":
+          return {
+            width: "70px",
+            height: "70px",
+            marginLeft: "-35px",
+            marginTop: "-35px",
+            backgroundColor: "#fff",
+            borderColor: "transparent",
+          };
+        case "link":
+          return {
+            width: "60px",
+            height: "60px",
+            marginLeft: "-30px",
+            marginTop: "-30px",
+            backgroundColor: isClicking ? "#0070f3" : "#fff",
+            borderColor: "transparent",
+          };
+        case "text":
+          return {
+            width: "6px",
+            height: "30px",
+            marginLeft: "-3px",
+            marginTop: "-15px",
+            backgroundColor: "#fff",
+            borderRadius: "2px",
+            borderColor: "transparent",
+          };
+        case "draggable":
+          return {
+            width: "50px",
+            height: "50px",
+            marginLeft: "-25px",
+            marginTop: "-25px",
+            backgroundColor: "transparent",
+            borderColor: "#fff",
+            borderWidth: "2px",
+            borderStyle: "solid",
+          };
+        default:
+          return {
+            width: isHovering ? "60px" : "20px",
+            height: isHovering ? "60px" : "20px",
+            marginLeft: isHovering ? "-30px" : "-10px",
+            marginTop: isHovering ? "-30px" : "-10px",
+            backgroundColor: "#fff",
+            borderColor: "transparent",
+          };
+      }
+    };
+
+    const cursorStyle = getCursorStyle();
+
     // Animate main cursor size changes
     gsap.to(cursorRef.current, {
-      width: isHovering ? "60px" : "20px",
-      height: isHovering ? "60px" : "20px",
-      marginLeft: isHovering ? "-30px" : "-10px",
-      marginTop: isHovering ? "-30px" : "-10px",
+      width: cursorStyle.width,
+      height: cursorStyle.height,
+      marginLeft: cursorStyle.marginLeft,
+      marginTop: cursorStyle.marginTop,
+      backgroundColor: cursorStyle.backgroundColor,
+      borderColor: cursorStyle.borderColor,
+      borderWidth: cursorStyle.borderWidth,
+      borderStyle: cursorStyle.borderStyle,
+      borderRadius: cursorStyle.borderRadius || "50%",
       opacity: visible ? 1 : 0,
       duration: 0.3,
       ease: "power2.out",
@@ -335,7 +520,7 @@ const CustomCursor = () => {
         ease: "power2.out",
       });
     }
-  }, [isHovering, visible, cursorText, isTouchDevice]);
+  }, [isHovering, visible, cursorText, isTouchDevice, cursorType, isClicking]);
 
   // Don't render anything if this is a touch device
   if (isTouchDevice) return null;
@@ -345,13 +530,14 @@ const CustomCursor = () => {
       {/* Main cursor element */}
       <div
         ref={cursorRef}
-        className="fixed pointer-events-none z-[9999] rounded-full"
+        className="fixed pointer-events-none z-[9999] rounded-full border-2 border-solid border-transparent"
         style={{
           backgroundColor: "#fff",
           mixBlendMode: "difference",
           position: "fixed",
           top: 0,
           left: 0,
+          transition: "border-color 0.3s",
         }}
       />
 

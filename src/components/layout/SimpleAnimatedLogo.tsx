@@ -65,7 +65,7 @@ const SimpleAnimatedLogo = () => {
           if (entry.isIntersecting) {
             // Create timeline for the animation
             const pathsTl = gsap.timeline({
-              delay: 0.8, // Start after other footer content animations
+              delay: 0.5, // Start after other footer content animations
             });
 
             // Animate each letter with staggered timing
