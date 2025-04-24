@@ -1,5 +1,4 @@
-import React, { useRef, useEffect } from "react";
-import { gsap } from "gsap";
+import React, { useRef, useEffect, useState } from "react";
 
 interface MarqueeProps {
   text: string;
@@ -12,133 +11,158 @@ interface MarqueeProps {
 const Marquee = ({
   text,
   index,
-  speed = 60,
+  speed = 20,
   spacing = "mx-1 lg:mx-4",
   textSize = "text-4xl md:text-6xl lg:text-9xl",
 }: MarqueeProps) => {
-  const marqueeRef = useRef<HTMLDivElement | null>(null);
-  const animationRef = useRef<gsap.core.Tween | null>(null);
+  const marqueeRef = useRef<HTMLDivElement>(null);
+  const contentRef1 = useRef<HTMLDivElement>(null);
+  const contentRef2 = useRef<HTMLDivElement>(null);
+  const requestRef = useRef<number>(0);
+  const startTimeRef = useRef<number>(0);
   const direction = index % 2 === 0 ? -1 : 1; // Alternating direction based on index
+  const [elementWidth, setElementWidth] = useState(0);
 
-  useEffect(() => {
-    if (!marqueeRef.current) return;
-
-    const marqueeElement = marqueeRef.current;
-
-    // Calculate container width and required repetitions
-    const calculateRepeatCount = () => {
-      const viewportWidth = window.innerWidth;
-      // Use a more reliable approach to estimate text width
-      const tempSpan = document.createElement("span");
-      tempSpan.innerText = text;
-      tempSpan.style.visibility = "hidden";
-      tempSpan.className = spacing;
-      document.body.appendChild(tempSpan);
-      const textWidth = tempSpan.offsetWidth;
-      document.body.removeChild(tempSpan);
-
-      return Math.ceil(viewportWidth / textWidth) + 5;
-    };
-
-    const repeatCount = calculateRepeatCount();
-    marqueeElement.innerHTML = "";
-
-    // Create two divs for seamless looping
-    const container1 = document.createElement("div");
-    const container2 = document.createElement("div");
-
-    container1.className = "whitespace-nowrap inline-block";
-    container2.className = "whitespace-nowrap inline-block";
-
-    // Fill containers with repeated text
-    for (let i = 0; i < repeatCount; i++) {
-      container1.innerHTML += `<span class="${spacing}">${text}</span>`;
-      container2.innerHTML += `<span class="${spacing}">${text}</span>`;
+  // Custom animation loop using requestAnimationFrame instead of GSAP
+  const animate = (timestamp: number) => {
+    if (!startTimeRef.current) {
+      startTimeRef.current = timestamp;
     }
 
-    marqueeElement.appendChild(container1);
-    marqueeElement.appendChild(container2);
+    if (!contentRef1.current || !contentRef2.current) return;
 
-    // Animation settings
-    const animationSettings = {
-      x: direction === -1 ? "-100%" : "0%",
-      repeat: -1,
-      duration: speed,
-      ease: "linear",
-      repeatRefresh: true,
-      paused: false,
-    };
+    // Calculate how far we've moved
+    const elapsed = timestamp - startTimeRef.current;
+    // Adjust speed - lower number = faster animation
+    const speedFactor = 0.05 / speed;
 
-    // Initial positions
+    // Calculate position based on elapsed time
+    let position = (elapsed * speedFactor) % 100;
+
+    // Apply the position differently based on direction
     if (direction === -1) {
-      gsap.set([container1, container2], { x: 0 });
+      contentRef1.current.style.transform = `translateX(-${position}%)`;
+      contentRef2.current.style.transform = `translateX(-${position + 100}%)`;
+
+      // When the first container goes off-screen, reset positions
+      if (position > 99.9) {
+        position = 0;
+        startTimeRef.current = timestamp;
+      }
     } else {
-      gsap.set([container1, container2], { x: "-100%" });
+      contentRef1.current.style.transform = `translateX(${position - 100}%)`;
+      contentRef2.current.style.transform = `translateX(${position}%)`;
+
+      // When the second container goes off-screen, reset positions
+      if (position > 99.9) {
+        position = 0;
+        startTimeRef.current = timestamp;
+      }
     }
 
-    // Create the animation
-    const animation = gsap.to([container1, container2], animationSettings);
-    animationRef.current = animation;
+    // Continue the animation loop
+    requestRef.current = requestAnimationFrame(animate);
+  };
 
-    // Ensure animation doesn't pause on hover
-    const preventPause = (e: MouseEvent) => {
-      e.preventDefault();
-      if (animationRef.current && animationRef.current.paused()) {
-        animationRef.current.play();
-      }
+  // Calculate how many repeats we need to fill the screen
+  useEffect(() => {
+    const calculateNeededRepeats = () => {
+      if (!marqueeRef.current) return 5;
+
+      // Create a test element to measure text width
+      const testElement = document.createElement("span");
+      testElement.textContent = text;
+      testElement.className = spacing + " " + textSize;
+      testElement.style.position = "absolute";
+      testElement.style.visibility = "hidden";
+      document.body.appendChild(testElement);
+
+      const singleWidth = testElement.offsetWidth;
+      document.body.removeChild(testElement);
+
+      const screenWidth = window.innerWidth;
+      const repeatsNeeded = Math.ceil(screenWidth / singleWidth) + 2;
+
+      return repeatsNeeded;
     };
 
-    // Add event listeners to ensure the animation never stops
-    marqueeElement.addEventListener("mouseenter", preventPause);
-    marqueeElement.addEventListener("mouseover", preventPause);
-    marqueeElement.addEventListener("mouseleave", preventPause);
+    const repeats = calculateNeededRepeats();
+    setElementWidth(repeats);
+
+    // Start the animation
+    requestRef.current = requestAnimationFrame(animate);
 
     // Handle window resize
     const handleResize = () => {
-      // Kill existing animation
-      if (animationRef.current) {
-        animationRef.current.kill();
-      }
-
-      // Recalculate
-      const newRepeatCount = calculateRepeatCount();
-
-      // Update content
-      container1.innerHTML = "";
-      container2.innerHTML = "";
-
-      for (let i = 0; i < newRepeatCount; i++) {
-        container1.innerHTML += `<span class="${spacing}">${text}</span>`;
-        container2.innerHTML += `<span class="${spacing}">${text}</span>`;
-      }
-
-      // Restart animation with new settings
-      const newAnimation = gsap.to([container1, container2], animationSettings);
-      animationRef.current = newAnimation;
+      const newRepeats = calculateNeededRepeats();
+      setElementWidth(newRepeats);
     };
 
     window.addEventListener("resize", handleResize);
 
-    // Clean up
+    // Cleanup function
     return () => {
-      if (animationRef.current) {
-        animationRef.current.kill();
+      if (requestRef.current) {
+        cancelAnimationFrame(requestRef.current);
       }
-      marqueeElement.removeEventListener("mouseenter", preventPause);
-      marqueeElement.removeEventListener("mouseover", preventPause);
-      marqueeElement.removeEventListener("mouseleave", preventPause);
       window.removeEventListener("resize", handleResize);
     };
-  }, [text, direction, spacing, speed]);
+  }, [text, spacing, textSize, speed]);
+
+  // Create repeated text elements
+  const createRepeatedElements = (count: number) => {
+    const elements = [];
+    for (let i = 0; i < count; i++) {
+      elements.push(
+        <span key={i} className={spacing}>
+          {text}
+        </span>,
+      );
+    }
+    return elements;
+  };
 
   return (
-    <div className="overflow-visible whitespace-nowrap w-screen z-10 pointer-events-none">
-      <div
-        ref={marqueeRef}
-        className="flex items-center h-full pointer-events-none"
-        style={{ willChange: "transform" }}
-      >
-        <span className={`${spacing} ${textSize}`}>{text}</span>
+    <div
+      className="overflow-hidden whitespace-nowrap w-screen z-10 select-none"
+      ref={marqueeRef}
+      style={{
+        pointerEvents: "none",
+        touchAction: "none",
+        userSelect: "none",
+        WebkitUserSelect: "none",
+        MozUserSelect: "none",
+        msUserSelect: "none",
+      }}
+    >
+      <div className="relative">
+        <div
+          ref={contentRef1}
+          className={`absolute whitespace-nowrap inline-block ${textSize}`}
+          style={{
+            willChange: "transform",
+            pointerEvents: "none",
+            touchAction: "none",
+            userSelect: "none",
+          }}
+        >
+          {createRepeatedElements(elementWidth)}
+        </div>
+        <div
+          ref={contentRef2}
+          className={`absolute whitespace-nowrap inline-block ${textSize}`}
+          style={{
+            willChange: "transform",
+            pointerEvents: "none",
+            touchAction: "none",
+            userSelect: "none",
+          }}
+        >
+          {createRepeatedElements(elementWidth)}
+        </div>
+
+        {/* Invisible spacer to maintain height */}
+        <div className={`opacity-0 ${textSize}`}>{text}</div>
       </div>
     </div>
   );

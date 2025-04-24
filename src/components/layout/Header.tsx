@@ -46,12 +46,8 @@ function Header() {
     typeof window !== "undefined" ? window.innerWidth < 768 : false;
   const logoSize = isMobile ? 36 : 48;
 
-  const handleOpenMenu = () => {
-    setMenuOpen(true);
-  };
-
-  const handleCloseMenu = () => {
-    setMenuOpen(false);
+  const toggleMenu = () => {
+    setMenuOpen(!menuOpen);
   };
 
   // GSAP animations - trigger immediately on mount
@@ -109,7 +105,7 @@ function Header() {
     <>
       <div
         ref={headerRef}
-        className="px-4 md:px-12 py-4 fixed top-0 left-0 right-0 z-[200] flex justify-between items-center text-foreground opacity-0 mix-blend-difference"
+        className="px-4 py-4 fixed top-0 left-0 right-0 z-[200] flex justify-between items-center text-foreground opacity-0 mix-blend-difference select-none"
       >
         {/* Logo */}
         <div ref={logoRef} className="opacity-0 relative z-[201]">
@@ -134,7 +130,7 @@ function Header() {
         <div
           ref={menuButtonRef}
           className="uppercase text-xs md:text-sm bg-white text-foreground w-12 md:w-16 rounded-full flex items-center justify-center h-10 md:h-14 font-semibold cursor-pointer transition-transform duration-300 hover:scale-110 opacity-0 relative z-[201]"
-          onClick={menuOpen ? handleCloseMenu : handleOpenMenu}
+          onClick={toggleMenu}
           data-cursor-hover
           data-cursor-text={menuOpen ? "Close Menu" : "Open Menu"}
           data-cursor-type="button"
@@ -144,7 +140,10 @@ function Header() {
       </div>
 
       {/* Fullscreen Menu Component - moved outside header div */}
-      <FullscreenMenu isOpen={menuOpen} />
+      <FullscreenMenu
+        isOpen={menuOpen}
+        onLinkClick={() => setMenuOpen(false)}
+      />
     </>
   );
 }

@@ -1,109 +1,273 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import { gsap } from "gsap";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import Marquee from "../Marquee";
 
-/**
- * FullscreenMenu Component
- *
- * A minimalist fullscreen menu that creates a black corridor animation effect
- * when opening and closing.
- *
- * @param {boolean} isOpen - Controls the menu's open/close state
- */
 interface FullscreenMenuProps {
   isOpen: boolean;
+  onLinkClick?: () => void;
 }
 
-const FullscreenMenu = ({ isOpen }: FullscreenMenuProps) => {
+const FullscreenMenu = ({ isOpen, onLinkClick }: FullscreenMenuProps) => {
   const menuRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [timeline, setTimeline] = useState<gsap.core.Timeline | null>(null);
+  const router = useRouter();
+  const [hoveredItem, setHoveredItem] = useState<string | null>(null);
 
-  // Initialize GSAP animations and handle open/close
+  // Initialize the timeline only once
   useEffect(() => {
-    const defaultEase = "power4.inOut";
-    // Function to open menu
-    const openMenu = () => {
-      gsap.to(menuRef.current, {
-        clipPath: "polygon(0% 100%, 100% 100%, 100% 0%, 0% 0%)",
-        pointerEvents: "all",
-        duration: 1.25,
-        ease: defaultEase,
-      });
-    };
-
-    // Function to close menu
-    const closeMenu = () => {
-      gsap.to(menuRef.current, {
-        clipPath: "polygon(0% 0%, 100% 0%, 100% 0%, 0% 0%)",
+    if (menuRef.current && contentRef.current) {
+      gsap.set(menuRef.current, {
+        opacity: 0,
+        clipPath:
+          "polygon(49.75% 49.75%, 50.25% 49.75%, 50.25% 50.25%, 49.75% 50.25%)",
         pointerEvents: "none",
-        duration: 1.25,
-        ease: defaultEase,
+      });
+      gsap.set(contentRef.current, { opacity: 0 });
+
+      // Create the animation timeline
+      const tl = gsap.timeline({
+        paused: true,
+        defaults: { ease: "power3.inOut" },
         onComplete: () => {
+          // Animation completed
+        },
+        onReverseComplete: () => {
+          // Animation reversed
           gsap.set(menuRef.current, {
-            clipPath: "polygon(0% 100%, 100% 100%, 100% 100%, 0% 100%)",
+            opacity: 0,
+            clipPath:
+              "polygon(49.75% 49.75%, 50.25% 49.75%, 50.25% 50.25%, 49.75% 50.25%)",
+            pointerEvents: "none",
           });
         },
       });
-    };
 
-    // Watch for isOpen changes and trigger animations
-    if (isOpen) {
-      openMenu();
-    } else {
-      if (menuRef.current) {
-        const computedStyle = window.getComputedStyle(menuRef.current);
-        const clipPath = computedStyle.clipPath;
-        // Only run close animation if menu was previously open
-        if (clipPath !== "polygon(0% 100%, 100% 100%, 100% 100%, 0% 100%)") {
-          closeMenu();
-        }
-      }
+      // Setup the corridor animation sequence
+      tl.to(menuRef.current, {
+        duration: 0.3,
+        opacity: 1,
+      });
+
+      tl.to(
+        menuRef.current,
+        {
+          duration: 1,
+          clipPath: "polygon(49.75% 0%, 50.25% 0%, 50.25% 100%, 49.75% 100%)",
+        },
+        "-=0.3",
+      );
+
+      tl.to(menuRef.current, {
+        duration: 1,
+        clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
+        pointerEvents: "all",
+      });
+
+      // Fade in content
+      tl.to(
+        contentRef.current,
+        {
+          opacity: 1,
+          duration: 0.6,
+        },
+        "-=0.5",
+      );
+
+      setTimeline(tl);
     }
-  }, [isOpen]);
+
+    return () => {
+      if (timeline) {
+        timeline.kill();
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const menuItems = useMemo(
+    () => [
+      { name: "HOME", href: "/" },
+      { name: "ABOUT", href: "/about" },
+      { name: "PROJECTS", href: "/projects" },
+      { name: "CONTACT", href: "/contact" },
+    ],
+    [],
+  );
+
+  // prefetch the pages
+  useEffect(() => {
+    menuItems.forEach((item) => {
+      router.prefetch(item.href);
+    });
+  }, [menuItems, router]);
+
+  // Control timeline playback based on isOpen state
+  useEffect(() => {
+    if (!timeline) return;
+
+    if (isOpen) {
+      timeline.play();
+      // Prevent scrolling when menu is open
+      document.body.style.overflow = "hidden";
+    } else {
+      timeline.reverse();
+      // Re-enable scrolling when menu is closed
+      document.body.style.overflow = "";
+    }
+  }, [isOpen, timeline]);
+
+  // Cleanup function to ensure scrolling is re-enabled if component unmounts while open
+  useEffect(() => {
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, []);
+
+  // Handle link click with delayed navigation
+  const handleLinkClick = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    href: string,
+  ) => {
+    e.preventDefault();
+
+    // Store navigation information in sessionStorage for the target page to detect
+    sessionStorage.setItem("menuNavigation", "true");
+    sessionStorage.setItem("menuDestination", href);
+
+    // Trigger menu closing first
+    if (onLinkClick) {
+      onLinkClick();
+    }
+
+    // Wait for animation to start before navigating
+    // This delay should be adjusted based on the animation timing
+    setTimeout(() => {
+      // Dispatch a custom event that can be listened to by page components
+      console.log(`Dispatching pageTransition event to ${href}`);
+
+      try {
+        // Create and dispatch the event
+        const navigationEvent = new CustomEvent("pageTransition", {
+          detail: { destination: href },
+          bubbles: true, // Ensure the event bubbles up
+          cancelable: false,
+        });
+        window.dispatchEvent(navigationEvent);
+        console.log("Event dispatched successfully");
+      } catch (error) {
+        console.error("Error dispatching navigation event:", error);
+      }
+
+      // Small additional delay to ensure event is processed
+      setTimeout(() => {
+        router.push(href);
+      }, 100); // Increased from 50ms to 100ms for better reliability
+    }, 800); // Delay matches roughly half the animation duration
+  };
 
   return (
     <div
       ref={menuRef}
-      className="menu fixed top-0 left-0 w-screen h-screen md:px-38 md:py-36 bg-background-secondary z-50 pointer-events-none overflow-hidden pt-20"
+      className="fixed top-0 left-0 w-screen h-screen bg-background-secondary z-50 pointer-events-none overflow-hidden"
       style={{
-        clipPath: "polygon(0% 100%, 100% 100%, 100% 100%, 0% 100%)",
+        opacity: 0,
+        clipPath:
+          "polygon(49.75% 49.75%, 50.25% 49.75%, 50.25% 50.25%, 49.75% 50.25%)",
       }}
     >
-      <div className="h-full w-full flex justify-items-start items-center">
-        <div className="flex flex-col gap-12 text-[130px] leading-none uppercase text-foreground-secondary">
-          <Link
-            href="/"
-            className="w-fit"
+      {/* Content container */}
+      <div
+        ref={contentRef}
+        className="h-full w-full opacity-0 flex flex-col justify-center items-center relative"
+      >
+        {/* Menu blocks container */}
+        <div className="flex flex-col items-center gap-2 sm:gap-3 md:gap-4 w-full">
+          {menuItems.map((item, index) => (
+            <div
+              key={index}
+              className="menu-block text-center relative w-full"
+              onMouseEnter={() => setHoveredItem(item.name)}
+              onMouseLeave={() => setHoveredItem(null)}
+            >
+              <div className="flex items-center justify-center relative pointer-events-auto">
+                <Link
+                  href={item.href}
+                  className={`text-3xl sm:text-4xl md:text-6xl lg:text-9xl font-bold text-foreground-secondary hover:text-foreground-secondary/80 transition-colors duration-300 ${hoveredItem === item.name ? "opacity-0" : "opacity-100"}`}
+                  data-cursor-hover
+                  data-cursor-text="View"
+                  data-cursor-type="link"
+                  onClick={(e) => handleLinkClick(e, item.href)}
+                >
+                  {item.name}
+                </Link>
+
+                {hoveredItem === item.name && (
+                  <Link
+                    href={item.href}
+                    data-cursor-type="link"
+                    data-cursor-text="View"
+                    data-cursor-hover
+                    className="absolute left-0 right-0 text-3xl sm:text-4xl md:text-6xl lg:text-9xl font-bold text-foreground-secondary flex items-center justify-center h-16 sm:h-20 md:h-24 lg:h-32 pointer-events-auto"
+                    onClick={(e) => handleLinkClick(e, item.href)}
+                  >
+                    <Marquee text={item.name} speed={10} index={index} />
+                  </Link>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Bottom content */}
+        <div className="absolute bottom-4 sm:bottom-6 md:bottom-8 w-full px-4 sm:px-6 md:px-8 flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-0 pointer-events-auto">
+          {/* Social Links - Left */}
+          <div className="flex gap-3 sm:gap-4 md:gap-5 text-sm sm:text-base">
+            <a
+              href="https://instagram.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-foreground-secondary hover:opacity-70 transition-opacity flex items-center"
+              data-cursor-hover
+              data-cursor-type="link"
+            >
+              Instagram
+            </a>
+            <a
+              href="https://github.com/rvph10"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-foreground-secondary hover:opacity-70 transition-opacity flex items-center"
+              data-cursor-hover
+              data-cursor-type="link"
+            >
+              Github
+            </a>
+            <a
+              href="https://linkedin.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-foreground-secondary hover:opacity-70 transition-opacity flex items-center"
+              data-cursor-hover
+              data-cursor-type="link"
+            >
+              LinkedIn
+            </a>
+          </div>
+
+          {/* Email - Right */}
+          <a
+            href="mailto:contact@upintown.dev"
+            className="text-foreground-secondary hover:opacity-70 transition-opacity text-sm sm:text-base"
+            data-cursor-hover
             data-cursor-type="link"
-            data-animate="font-weight"
           >
-            Home
-          </Link>
-          <Link
-            href="/about"
-            className="w-fit"
-            data-cursor-type="link"
-            data-animate="font-weight"
-          >
-            About
-          </Link>
-          <Link
-            href="/services"
-            className="w-fit"
-            data-cursor-type="link"
-            data-animate="font-weight"
-          >
-            Services
-          </Link>
-          <Link
-            href="/contact"
-            className="w-fit"
-            data-cursor-type="link"
-            data-animate="font-weight"
-          >
-            Contact
-          </Link>
+            contact@upintown.dev
+          </a>
         </div>
       </div>
     </div>

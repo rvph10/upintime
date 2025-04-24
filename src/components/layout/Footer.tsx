@@ -267,7 +267,7 @@ const Footer = () => {
           {/* Right columns */}
           <div
             ref={navColumnsRef}
-            className="grid grid-cols-2 md:grid-cols-3 gap-12 md:gap-20 sm:gap-8 text-sm w-full sm:w-auto"
+            className="grid grid-cols-2 md:grid-cols-2 gap-12 md:gap-20 sm:gap-8 text-sm w-full sm:w-auto"
           >
             {/* Navigation links */}
             <div className="flex flex-col gap-3">
