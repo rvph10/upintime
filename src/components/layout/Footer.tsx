@@ -56,7 +56,7 @@ const Footer = () => {
         {
           // Trigger when at least 20% of the footer is visible
           threshold: 0.2,
-        },
+        }
       );
 
       // Start observing the footer
@@ -75,7 +75,7 @@ const Footer = () => {
       gsap.fromTo(
         messageRef.current,
         { opacity: 0, y: 5 },
-        { opacity: 1, y: 0, duration: 0.4 },
+        { opacity: 1, y: 0, duration: 0.4 }
       );
     }
   }, [message]);
@@ -166,7 +166,7 @@ const Footer = () => {
     } catch (error) {
       setIsError(true);
       setMessage(
-        error instanceof Error ? error.message : "Failed to subscribe",
+        error instanceof Error ? error.message : "Failed to subscribe"
       );
 
       // Subtle shake animation for error
@@ -221,7 +221,7 @@ const Footer = () => {
                     }`}
                     required
                     disabled={isLoading}
-                    data-cursor-hover
+                    data-cursor-hover={true}
                     data-cursor-type="text"
                   />
                   <button
@@ -234,7 +234,7 @@ const Footer = () => {
                           : "hover:bg-background/90"
                     }`}
                     disabled={isLoading || !!validationError}
-                    data-cursor-hover
+                    data-cursor-hover={true}
                     data-cursor-type="button"
                     data-cursor-text={
                       isLoading ? "Subscribing..." : "Subscribe"
@@ -277,32 +277,32 @@ const Footer = () => {
               <TransitionLink
                 href="/"
                 className="hover:opacity-70 transition-opacity"
-                dataCursorHover={true}
-                dataCursorType="link"
+                data-cursor-hover={true}
+                data-cursor-type="link"
               >
                 Home
               </TransitionLink>
               <TransitionLink
                 href="/projects"
                 className="hover:opacity-70 transition-opacity"
-                dataCursorHover={true}
-                dataCursorType="link"
+                data-cursor-hover={true}
+                data-cursor-type="link"
               >
                 Projects
               </TransitionLink>
               <TransitionLink
                 href="/about"
                 className="hover:opacity-70 transition-opacity"
-                dataCursorHover={true}
-                dataCursorType="link"
+                data-cursor-hover={true}
+                data-cursor-type="link"
               >
                 About
               </TransitionLink>
               <TransitionLink
                 href="/contact"
                 className="hover:opacity-70 transition-opacity"
-                dataCursorHover={true}
-                dataCursorType="link"
+                data-cursor-hover={true}
+                data-cursor-type="link"
               >
                 Contact
               </TransitionLink>
@@ -318,7 +318,7 @@ const Footer = () => {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:opacity-70 transition-opacity flex items-center"
-                data-cursor-hover
+                data-cursor-hover={true}
                 data-cursor-type="link"
               >
                 Instagram <span className="ml-1">↗</span>
@@ -328,7 +328,7 @@ const Footer = () => {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:opacity-70 transition-opacity flex items-center"
-                data-cursor-hover
+                data-cursor-hover={true}
                 data-cursor-type="link"
               >
                 Github <span className="ml-1">↗</span>
@@ -338,7 +338,7 @@ const Footer = () => {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:opacity-70 transition-opacity flex items-center"
-                data-cursor-hover
+                data-cursor-hover={true}
                 data-cursor-type="link"
               >
                 LinkedIn <span className="ml-1">↗</span>
@@ -353,7 +353,7 @@ const Footer = () => {
               <a
                 href="mailto:contact@upintown.dev"
                 className="hover:opacity-70 transition-opacity"
-                data-cursor-hover
+                data-cursor-hover={true}
                 data-cursor-type="link"
               >
                 contact@upintown.dev
