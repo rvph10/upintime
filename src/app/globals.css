@@ -9,6 +9,13 @@
   --font-primary: "Poppins", sans-serif;
 }
 
+html,
+body {
+  overscroll-behavior: none;
+  overscroll-behavior-y: none;
+  height: 100%;
+}
+
 /* Hide default cursor */
 * {
   cursor: none !important;
