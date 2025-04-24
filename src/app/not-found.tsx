@@ -225,7 +225,10 @@ export default function NotFound() {
       </div>
 
       <div className="block lg:hidden absolute bottom-10 right-4">
-        <Link href="/" className="text-foreground flex-col text-right font-bold text-2xl hover:opacity-70 transition-opacity flex items-end">
+        <Link
+          href="/"
+          className="text-foreground flex-col text-right font-bold text-2xl hover:opacity-70 transition-opacity flex items-end"
+        >
           <div>You&apos;re lost</div>
           <div>in Town</div>
         </Link>

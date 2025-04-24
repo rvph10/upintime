@@ -1,8 +1,8 @@
 "use client";
-import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import SimpleAnimatedLogo from "./SimpleAnimatedLogo";
+import TransitionLink from "../transition/TransitionLink";
 
 const Footer = () => {
   const [email, setEmail] = useState("");
@@ -274,38 +274,38 @@ const Footer = () => {
               <p className="text-xs uppercase tracking-wider opacity-50 mb-2">
                 (Navigation)
               </p>
-              <Link
+              <TransitionLink
                 href="/"
                 className="hover:opacity-70 transition-opacity"
-                data-cursor-hover
-                data-cursor-type="link"
+                dataCursorHover={true}
+                dataCursorType="link"
               >
                 Home
-              </Link>
-              <Link
+              </TransitionLink>
+              <TransitionLink
                 href="/projects"
                 className="hover:opacity-70 transition-opacity"
-                data-cursor-hover
-                data-cursor-type="link"
+                dataCursorHover={true}
+                dataCursorType="link"
               >
                 Projects
-              </Link>
-              <Link
+              </TransitionLink>
+              <TransitionLink
                 href="/about"
                 className="hover:opacity-70 transition-opacity"
-                data-cursor-hover
-                data-cursor-type="link"
+                dataCursorHover={true}
+                dataCursorType="link"
               >
                 About
-              </Link>
-              <Link
+              </TransitionLink>
+              <TransitionLink
                 href="/contact"
                 className="hover:opacity-70 transition-opacity"
-                data-cursor-hover
-                data-cursor-type="link"
+                dataCursorHover={true}
+                dataCursorType="link"
               >
                 Contact
-              </Link>
+              </TransitionLink>
             </div>
 
             {/* Social media */}
