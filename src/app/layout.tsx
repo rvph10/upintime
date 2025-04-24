@@ -18,8 +18,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="scroll-smooth">
-      <body className="mx-12 mt-8 bg-background text-primary min-h-screen font-primary flex flex-col overflow-x-hidden">
+    <html lang="en" className="scroll-smooth h-full">
+      <body className="mx-12 mt-8 bg-background text-primary h-full font-primary flex flex-col overflow-x-hidden">
         <PreloaderProvider>
           <CursorProvider>
             <HeaderWrapper />
