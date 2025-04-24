@@ -32,7 +32,7 @@ const TransitionLink = forwardRef<HTMLAnchorElement, TransitionLinkProps>(
       "data-cursor-text": dataCursorText,
       "data-cursor-type": dataCursorType,
     },
-    ref
+    ref,
   ) => {
     const { navigateTo } = usePageTransition();
 
@@ -55,7 +55,7 @@ const TransitionLink = forwardRef<HTMLAnchorElement, TransitionLinkProps>(
         {children}
       </Link>
     );
-  }
+  },
 );
 
 TransitionLink.displayName = "TransitionLink";

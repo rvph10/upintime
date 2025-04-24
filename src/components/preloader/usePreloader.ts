@@ -50,6 +50,7 @@ export function usePreloader(initialDelay = 10000) {
 
       return () => clearTimeout(timer);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialDelay]);
 
   return {

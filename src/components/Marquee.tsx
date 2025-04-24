@@ -107,6 +107,7 @@ const Marquee = ({
       }
       window.removeEventListener("resize", handleResize);
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [text, spacing, textSize, speed]);
 
   // Create repeated text elements
