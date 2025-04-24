@@ -1,8 +1,8 @@
 "use client";
 import React, { useRef, useEffect } from "react";
-import Link from "next/link";
 import Image from "next/image";
 import { gsap } from "gsap";
+import TransitionLink from "@/components/transition/TransitionLink";
 
 // Type definitions for GSAP and SplitText
 interface GSAPWindow extends Window {
@@ -173,7 +173,7 @@ export default function NotFound() {
   return (
     <div className="-mx-12 -mt-8 w-screen h-screen bg-background mb-6 overflow-hidden flex flex-col items-center justify-center">
       {/* Text content with responsive positioning */}
-      <Link
+      <TransitionLink
         href="/"
         className="hidden absolute top-26 right-4 sm:right-6 md:right-10 lg:block text-right group transition-all z-10" /* Added z-10 */
         data-cursor-hover
@@ -210,7 +210,7 @@ export default function NotFound() {
             in Town
           </h1>
         </div>
-      </Link>
+      </TransitionLink>
       {/* 404 */}
       <div className="flex justify-center items-center lg:absolute lg:bottom-0 lg:left-0 h-2/3">
         <Image
@@ -225,16 +225,25 @@ export default function NotFound() {
       </div>
 
       <div className="block lg:hidden absolute bottom-10 right-4">
-        <Link
+        <TransitionLink
           href="/"
+          data-cursor-hover
+          data-cursor-text="Head back to urbanity"
+          data-cursor-type="link"
           className="text-foreground flex-col text-right font-bold text-2xl hover:opacity-70 transition-opacity flex items-end"
         >
           <div>You&apos;re lost</div>
           <div>in Town</div>
-        </Link>
-        <button className="bg-foreground text-background px-2 py-1 rounded-lg text-right font-bold text-xl hover:opacity-70 transition-opacity flex items-center">
+        </TransitionLink>
+        <TransitionLink
+          data-cursor-hover
+          data-cursor-text="Head back to urbanity"
+          data-cursor-type="link"
+          href="/"
+          className="bg-foreground text-background px-2 py-1 rounded-lg text-right font-bold text-xl hover:opacity-70 transition-opacity flex items-center"
+        >
           Back to home
-        </button>
+        </TransitionLink>
       </div>
     </div>
   );

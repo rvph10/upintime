@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, MouseEvent } from "react";
+import { ReactNode, MouseEvent, forwardRef } from "react";
 import Link from "next/link";
 import { usePageTransition } from "./useTransition";
 
@@ -9,9 +9,10 @@ interface TransitionLinkProps {
   children: ReactNode;
   className?: string;
   isMenuLink?: boolean;
-  dataCursorHover?: boolean;
-  dataCursorText?: string;
-  dataCursorType?: string;
+  style?: React.CSSProperties;
+  "data-cursor-hover"?: boolean;
+  "data-cursor-text"?: string;
+  "data-cursor-type"?: string;
 }
 
 /**
@@ -19,36 +20,44 @@ interface TransitionLinkProps {
  * Use this for links that should trigger a page transition animation
  * Set isMenuLink=true for menu links to skip the transition
  */
-export default function TransitionLink({
-  href,
-  children,
-  className = "",
-  isMenuLink = false,
-  dataCursorHover = false,
-  dataCursorText,
-  dataCursorType,
-}: TransitionLinkProps) {
-  const { navigateTo } = usePageTransition();
+const TransitionLink = forwardRef<HTMLAnchorElement, TransitionLinkProps>(
+  (
+    {
+      href,
+      children,
+      className = "",
+      isMenuLink = false,
+      style,
+      "data-cursor-hover": dataCursorHover,
+      "data-cursor-text": dataCursorText,
+      "data-cursor-type": dataCursorType,
+    },
+    ref
+  ) => {
+    const { navigateTo } = usePageTransition();
 
-  const handleClick = (e: MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault();
-    navigateTo(href, isMenuLink);
-  };
+    const handleClick = (e: MouseEvent<HTMLAnchorElement>) => {
+      e.preventDefault();
+      navigateTo(href, isMenuLink);
+    };
 
-  // Prepare data attributes for cursor
-  const dataAttributes: Record<string, string | boolean> = {};
-  if (dataCursorHover) dataAttributes["data-cursor-hover"] = true;
-  if (dataCursorText) dataAttributes["data-cursor-text"] = dataCursorText;
-  if (dataCursorType) dataAttributes["data-cursor-type"] = dataCursorType;
+    return (
+      <Link
+        href={href}
+        className={className}
+        onClick={handleClick}
+        ref={ref}
+        style={style}
+        data-cursor-hover={dataCursorHover}
+        data-cursor-text={dataCursorText}
+        data-cursor-type={dataCursorType}
+      >
+        {children}
+      </Link>
+    );
+  }
+);
 
-  return (
-    <Link
-      href={href}
-      className={className}
-      onClick={handleClick}
-      {...dataAttributes}
-    >
-      {children}
-    </Link>
-  );
-}
+TransitionLink.displayName = "TransitionLink";
+
+export default TransitionLink;

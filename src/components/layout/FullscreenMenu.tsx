@@ -190,7 +190,7 @@ const FullscreenMenu = ({ isOpen, onLinkClick }: FullscreenMenuProps) => {
           {menuItems.map((item, index) => (
             <div
               key={index}
-              className="menu-block text-center relative w-full"
+              className="text-center relative w-full"
               onMouseEnter={() => setHoveredItem(item.name)}
               onMouseLeave={() => setHoveredItem(null)}
             >
