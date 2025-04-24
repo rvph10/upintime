@@ -1,44 +1,74 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { usePreloaderContext } from "@/components/preloader/PreloaderProvider";
 
 export default function Home() {
   const { isLoading } = usePreloaderContext();
-  const headingRef = useRef<HTMLHeadingElement>(null);
   const subheadingRef = useRef<HTMLDivElement>(null);
+  const [shouldAnimate, setShouldAnimate] = useState(false);
 
+  // Function to run animations
+  const runAnimations = () => {
+    const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+
+    gsap.set(subheadingRef.current, { opacity: 0, y: 20 });
+
+    // Animate the subheading
+    tl.to(
+      subheadingRef.current,
+      {
+        opacity: 1,
+        y: 0,
+        duration: 1,
+      },
+      "-=0.5",
+    ); // Start before the previous animation finishes
+  };
+
+  // Handle initial load animation
   useEffect(() => {
     // Only start animations when preloader is no longer showing
     if (!isLoading) {
       // Small delay to ensure the preloader has fully transitioned out
       const timer = setTimeout(() => {
-        const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
-
-        // Animate the heading
-        tl.to(headingRef.current, {
-          opacity: 1,
-          y: 0,
-          duration: 1,
-          delay: 0.3, // Small delay after preloader
-        });
-
-        // Animate the subheading
-        tl.to(
-          subheadingRef.current,
-          {
-            opacity: 1,
-            y: 0,
-            duration: 1,
-          },
-          "-=0.5",
-        ); // Start before the previous animation finishes
+        runAnimations();
       }, 300);
 
       return () => clearTimeout(timer);
     }
   }, [isLoading]);
+
+  // Listen for navigation events
+  useEffect(() => {
+    const handlePageTransition = (event: CustomEvent) => {
+      if (event.detail.destination === "/") {
+        setShouldAnimate(true);
+      }
+    };
+
+    // Add event listener for custom navigation events
+    window.addEventListener(
+      "pageTransition",
+      handlePageTransition as EventListener,
+    );
+
+    return () => {
+      window.removeEventListener(
+        "pageTransition",
+        handlePageTransition as EventListener,
+      );
+    };
+  }, []);
+
+  // Run animations when shouldAnimate changes
+  useEffect(() => {
+    if (shouldAnimate) {
+      runAnimations();
+      setShouldAnimate(false);
+    }
+  }, [shouldAnimate]);
 
   return (
     <div className="w-full min-h-screen flex items-center justify-center">
