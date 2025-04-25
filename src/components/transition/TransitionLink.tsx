@@ -2,10 +2,11 @@
 
 import { ReactNode, MouseEvent, forwardRef } from "react";
 import Link from "next/link";
+import type { Route } from "next";
 import { usePageTransition } from "./useTransition";
 
 interface TransitionLinkProps {
-  href: string;
+  href: Route;
   children: ReactNode;
   className?: string;
   isMenuLink?: boolean;

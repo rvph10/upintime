@@ -9,6 +9,9 @@
   --font-primary: "Poppins", sans-serif;
 }
 
+/* Lets add a viewport when the phone are in landscape mode */
+land
+
 html,
 body {
   overscroll-behavior: none;

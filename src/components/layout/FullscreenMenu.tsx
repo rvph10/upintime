@@ -4,7 +4,13 @@ import { useEffect, useRef, useState, useMemo } from "react";
 import { gsap } from "gsap";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import type { Route } from "next";
 import Marquee from "../Marquee";
+
+interface MenuItem {
+  name: string;
+  href: Route;
+}
 
 interface FullscreenMenuProps {
   isOpen: boolean;
@@ -89,12 +95,12 @@ const FullscreenMenu = ({ isOpen, onLinkClick }: FullscreenMenuProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const menuItems = useMemo(
+  const menuItems = useMemo<MenuItem[]>(
     () => [
-      { name: "HOME", href: "/" },
-      { name: "ABOUT", href: "/about" },
-      { name: "PROJECTS", href: "/projects" },
-      { name: "CONTACT", href: "/contact" },
+      { name: "HOME", href: "/" as Route },
+      { name: "ABOUT", href: "/about" as Route },
+      { name: "PROJECTS", href: "/projects" as Route },
+      { name: "CONTACT", href: "/contact" as Route },
     ],
     [],
   );
@@ -131,7 +137,7 @@ const FullscreenMenu = ({ isOpen, onLinkClick }: FullscreenMenuProps) => {
   // Handle link click with delayed navigation
   const handleLinkClick = (
     e: React.MouseEvent<HTMLAnchorElement>,
-    href: string,
+    href: Route,
   ) => {
     e.preventDefault();
 

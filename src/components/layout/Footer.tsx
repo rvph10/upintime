@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import SimpleAnimatedLogo from "./SimpleAnimatedLogo";
 import TransitionLink from "../transition/TransitionLink";
+import { MdOutlineArrowOutward } from "react-icons/md";
 
 const Footer = () => {
   const [email, setEmail] = useState("");
@@ -321,7 +322,7 @@ const Footer = () => {
                 data-cursor-hover={true}
                 data-cursor-type="link"
               >
-                Instagram <span className="ml-1">↗</span>
+                Instagram <MdOutlineArrowOutward className="ml-1 h-full" />
               </a>
               <a
                 href="https://github.com"
@@ -331,7 +332,7 @@ const Footer = () => {
                 data-cursor-hover={true}
                 data-cursor-type="link"
               >
-                Github <span className="ml-1">↗</span>
+                Github <MdOutlineArrowOutward className="ml-1 h-full" />
               </a>
               <a
                 href="https://linkedin.com"
@@ -341,7 +342,7 @@ const Footer = () => {
                 data-cursor-hover={true}
                 data-cursor-type="link"
               >
-                LinkedIn <span className="ml-1">↗</span>
+                LinkedIn <MdOutlineArrowOutward className="ml-1 h-full" />
               </a>
             </div>
 
