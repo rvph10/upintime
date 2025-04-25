@@ -206,7 +206,7 @@ const FullscreenMenu = ({ isOpen, onLinkClick }: FullscreenMenuProps) => {
                   {item.name}
                 </Link>
 
-                {hoveredItem === item.name && !('ontouchstart' in window) && (
+                {hoveredItem === item.name && !("ontouchstart" in window) && (
                   <Link
                     href={item.href}
                     data-cursor-type="link"
