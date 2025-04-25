@@ -27,13 +27,15 @@ export default function ContactPage() {
           font-bold uppercase text-xl hidden md:block md:text-3xl lg:text-6xl text-right"
       >
         <a
-        data-cursor-hover
-        data-cursor-text="Email us"
-        data-cursor-type="link"
+          data-cursor-hover
+          data-cursor-text="Email us"
+          data-cursor-type="link"
           href="mailto:contact@upintown.dev"
           className="hover:opacity-80 transition-opacity"
         >
-          contact<br/>@upintown.dev
+          contact
+          <br />
+          @upintown.dev
         </a>
       </div>
 
