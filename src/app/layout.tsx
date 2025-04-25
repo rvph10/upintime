@@ -115,7 +115,7 @@ export default function RootLayout({
           <PreloaderProvider>
             <CursorProvider>
               <HeaderWrapper />
-              <main className="flex-grow relative z-0">
+              <main>
                 {children}
                 <Analytics />
               </main>

@@ -24,7 +24,7 @@ const ContactForm = ({ className }: { className?: string }) => {
 
   // Handle form input changes with a single handler
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
     setFormState((prev) => ({
@@ -88,7 +88,7 @@ const ContactForm = ({ className }: { className?: string }) => {
   return (
     <form
       onSubmit={handleSubmit}
-      className={`flex flex-col gap-4 sm:gap-6 mix-blend-difference text-foreground-secondary backdrop-blur-sm bg-background/5 p-4 sm:p-6 md:p-8 rounded-lg ${className}`}
+      className={`flex flex-col gap-4 sm:gap-6 mix-blend-difference text-foreground-secondary p-4 ${className}`}
       autoComplete="off"
     >
       {/* Form Title - Only visible on mobile */}
