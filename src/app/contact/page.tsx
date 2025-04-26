@@ -10,12 +10,12 @@ export default function ContactPage() {
   return (
     <div className="w-full max-sm:mt-12 min-h-screen relative flex items-center justify-center px-5 py-16 md:p-0">
       {/* Form - Centered on mobile, positioned on larger screens */}
-      <ContactForm className="w-full max-w-md  lg:max-w-lg lg:absolute lg:bottom-16 lg:left-26 z-10" />
+      <ContactForm className="w-full max-w-md lg:max-w-lg lg:absolute lg:bottom-16 lg:left-26 z-10" />
 
-      {/* Spline blob - Hidden on very small screens for performance */}
-      <div className="hidden md:block">
+      {/* Spline blob - Now positioned fixed in viewport */}
+      <div className="fixed inset-0 w-screen h-screen overflow-hidden pointer-events-none hidden md:block" style={{ zIndex: -1 }}>
         <Spline
-          className="absolute z-[-1] h-full w-full inset-0"
+          className="w-full h-full"
           scene="https://prod.spline.design/PH0P4acRZe4DmDNP/scene.splinecode"
         />
       </div>
