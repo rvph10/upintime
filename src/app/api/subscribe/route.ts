@@ -1,7 +1,19 @@
 import { NextResponse } from "next/server";
+import { applyRateLimit } from "@/lib/rate-limit";
 
 export async function POST(request: Request) {
   try {
+    // Apply rate limiting - 3 requests per minute
+    const rateLimitResponse = await applyRateLimit(
+      request,
+      "subscribe",
+      3,
+      "60 s",
+    );
+    if (rateLimitResponse) {
+      return rateLimitResponse;
+    }
+
     const { email } = await request.json();
 
     // Validate email
