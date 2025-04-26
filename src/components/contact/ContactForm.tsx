@@ -29,7 +29,7 @@ const ContactForm = ({ className }: { className?: string }) => {
 
   // Handle form input changes with a single handler
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     setFormState((prev) => ({
