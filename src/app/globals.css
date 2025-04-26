@@ -10,7 +10,7 @@
 }
 
 /* Lets add a viewport when the phone are in landscape mode */
-land html,
+html,
 body {
   overscroll-behavior: none;
   overscroll-behavior-y: none;
