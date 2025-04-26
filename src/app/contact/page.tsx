@@ -11,8 +11,6 @@ export default function ContactPage() {
     <div className="w-full max-sm:mt-12 min-h-screen relative flex items-center justify-center px-5 py-16 md:p-0">
       {/* Form - Centered on mobile, positioned on larger screens */}
       <ContactForm className="w-full max-w-md lg:max-w-lg lg:absolute lg:bottom-16 lg:left-26 z-10" />
-      {/* Form - Centered on mobile, positioned on larger screens */}
-      <ContactForm className="w-full max-w-md lg:max-w-lg lg:absolute lg:bottom-16 lg:left-26 z-10" />
 
       {/* Spline blob with adjusted container */}
       <div className="absolute top-[-100px] left-0 right-0 bottom-0 h-[calc(100%+200px)] overflow-visible hidden md:block z-5">
