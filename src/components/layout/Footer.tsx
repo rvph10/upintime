@@ -187,8 +187,8 @@ const Footer = () => {
   };
 
   return (
-    <footer className="relative -mx-12 bottom-0 px-16 sm:px-8 xs:px-6 py-12 sm:py-8 left-0 right-0 bg-foreground text-background">
-      <div className="max-w-7xl mx-auto flex flex-col justify-center">
+    <footer className="relative -mx-4 sm:-mx-8 md:-mx-12 bottom-0 px-4 sm:px-8 xs:px-6 py-12 sm:py-8 left-0 right-0 bg-foreground text-background">
+      <div className="mx-auto flex flex-col justify-center">
         {/* Upper section */}
         <div className="flex flex-col md:flex-row justify-between items-start gap-12 mb-6 md:mb-16 sm:mb-10">
           {/* Left column */}
@@ -268,7 +268,7 @@ const Footer = () => {
           {/* Right columns */}
           <div
             ref={navColumnsRef}
-            className="grid grid-cols-2 md:grid-cols-2 gap-12 md:gap-20 sm:gap-8 text-sm w-full sm:w-auto"
+            className="grid grid-cols-2 lg:grid-cols-3 gap-12 md:gap-20 sm:gap-8 text-sm w-full sm:w-auto"
           >
             {/* Navigation links */}
             <div className="flex flex-col gap-3">
