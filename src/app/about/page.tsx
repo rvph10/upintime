@@ -40,10 +40,9 @@ export default function AboutPage() {
       gsap.set(imageContainerRef.current, {
         y: "-80%",
         x: "-30%",
-        scale: 0.40,
+        scale: 0.4,
       });
     }
-
 
     // Set initial state for text overlay - hidden
     gsap.set(textOverlayRef.current, {
@@ -69,7 +68,7 @@ export default function AboutPage() {
         scale: 1,
         ease: "none",
       },
-      0
+      0,
     );
 
     // Animate text overlay to appear when the image is expanded
@@ -79,7 +78,7 @@ export default function AboutPage() {
         opacity: 1,
         ease: "power2.out",
       },
-      0.8 // Start this animation at 80% of the timeline to make it appear near the end
+      0.8, // Start this animation at 80% of the timeline to make it appear near the end
     );
 
     // Clean up function
@@ -96,23 +95,31 @@ export default function AboutPage() {
       {/* Hero Section */}
       <section className="w-full h-screen relative">
         {/* Main Title - larger on desktop, smaller on mobile */}
-        <div className="title-text absolute text-background top-20 left-6 md:top-24 md:left-8 lg:left-12 lg:top-24 
-          font-black uppercase text-3xl md:text-5xl lg:text-7xl z-10 mix-blend-difference">
-          CODE<br />
+        <div
+          className="title-text absolute text-background top-20 left-6 md:top-24 md:left-8 lg:left-12 lg:top-24 
+          font-black uppercase text-3xl md:text-5xl lg:text-7xl z-10 mix-blend-difference"
+        >
+          CODE
+          <br />
           MEET CITY
         </div>
-        
+
         {/* Bottom Section Title - responsive positioning */}
-        <div className="absolute text-background bottom-12 md:bottom-16 lg:bottom-20 right-6 md:right-8 lg:right-12
-          font-black uppercase text-3xl md:text-5xl lg:text-7xl text-right z-10 mix-blend-difference">
-          BUILDING<br />
+        <div
+          className="absolute text-background bottom-12 md:bottom-16 lg:bottom-20 right-6 md:right-8 lg:right-12
+          font-black uppercase text-3xl md:text-5xl lg:text-7xl text-right z-10 mix-blend-difference"
+        >
+          BUILDING
+          <br />
           DIGITAL TOWNS
         </div>
-        
+
         {/* Tagline - hidden on small mobile, visible elsewhere with responsive positioning */}
-        <div className="absolute text-background top-24 right-6 md:top-24 md:right-8 lg:right-12 lg:top-24
+        <div
+          className="absolute text-background top-24 right-6 md:top-24 md:right-8 lg:right-12 lg:top-24
           font-bold text-sm md:text-base lg:text-lg max-w-xs md:max-w-sm lg:max-w-md text-right z-10
-          hidden sm:block mix-blend-difference">
+          hidden sm:block mix-blend-difference"
+        >
           The city never sleeps, and neither do our applications. We build
           robust digital infrastructure that keeps your business moving 24/7,
           just like the urban rhythm that inspires us.
