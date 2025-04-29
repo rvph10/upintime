@@ -94,3 +94,28 @@ select:autofill {
     display: none;
   }
 }
+
+/* Page Transition Styles */
+.page-transition-wrapper {
+  position: relative;
+  width: 100%;
+  transition: opacity 0.4s ease-in-out;
+}
+
+.page-transition-wrapper.is-transitioning {
+  /* 
+   * This class will be applied to the current page 
+   * when it's preparing to receive focus after menu closes
+   */
+  animation: fadeIn 0.5s ease-out 0.3s forwards;
+  opacity: 0.95;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0.95;
+  }
+  to {
+    opacity: 1;
+  }
+}

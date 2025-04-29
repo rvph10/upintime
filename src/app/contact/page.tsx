@@ -8,12 +8,12 @@ import Spline from "@splinetool/react-spline";
  */
 export default function ContactPage() {
   return (
-    <div className="w-full max-sm:mt-12 min-h-screen relative flex items-center justify-center px-5 py-16 md:p-0">
+    <div className="w-full max-sm:mt-12 min-h-[calc(100vh-48px)]  md:min-h-screen relative flex items-center justify-center px-5 py-16 md:p-0">
       {/* Form - Centered on mobile, positioned on larger screens */}
       <ContactForm className="w-full max-w-md lg:max-w-lg lg:absolute lg:bottom-16 lg:left-26 z-10" />
 
       {/* Spline blob with adjusted container */}
-      <div className="absolute top-[-100px] left-0 right-0 bottom-0 h-[calc(100%+200px)] overflow-visible hidden md:block z-5">
+      <div className="absolute -mx-4 sm:-mx-8 md:-mx-12 top-[-100px] left-0 right-0 bottom-0 h-[calc(100%+200px)] overflow-visible hidden md:block z-5">
         <Spline
           className="absolute z-[-1] h-full w-full inset-0"
           scene="https://prod.spline.design/PH0P4acRZe4DmDNP/scene.splinecode"

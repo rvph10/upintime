@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { Route } from "next";
 import Marquee from "../Marquee";
+import { startBackgroundPageLoad } from "@/lib/utils/pageTransition";
 
 interface MenuItem {
   name: string;
@@ -145,35 +146,21 @@ const FullscreenMenu = ({ isOpen, onLinkClick }: FullscreenMenuProps) => {
     sessionStorage.setItem("menuNavigation", "true");
     sessionStorage.setItem("menuDestination", href);
 
+    // Immediately start loading the target page in the background
+    router.prefetch(href);
+
+    // Use our utility to start background loading and dispatch events
+    startBackgroundPageLoad(href as string);
+
     // Trigger menu closing first
     if (onLinkClick) {
       onLinkClick();
     }
 
-    // Wait for animation to start before navigating
-    // This delay should be adjusted based on the animation timing
+    // Wait for animation to complete before actual navigation
     setTimeout(() => {
-      // Dispatch a custom event that can be listened to by page components
-      console.log(`Dispatching pageTransition event to ${href}`);
-
-      try {
-        // Create and dispatch the event
-        const navigationEvent = new CustomEvent("pageTransition", {
-          detail: { destination: href },
-          bubbles: true, // Ensure the event bubbles up
-          cancelable: false,
-        });
-        window.dispatchEvent(navigationEvent);
-        console.log("Event dispatched successfully");
-      } catch (error) {
-        console.error("Error dispatching navigation event:", error);
-      }
-
-      // Small additional delay to ensure event is processed
-      setTimeout(() => {
-        router.push(href);
-      }, 100); // Increased from 50ms to 100ms for better reliability
-    }, 800); // Delay matches roughly half the animation duration
+      router.push(href);
+    }, 800); // Match this with the total animation duration
   };
 
   return (

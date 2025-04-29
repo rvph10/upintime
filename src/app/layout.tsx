@@ -6,6 +6,7 @@ import { PreloaderProvider } from "@/components/preloader/PreloaderProvider";
 import Footer from "@/components/layout/Footer";
 import { Analytics } from "@vercel/analytics/react";
 import { ViewTransitions } from "next-view-transitions";
+import PageTransitionWrapper from "@/components/layout/PageTransitionWrapper";
 
 /**
  * Viewport configuration for better responsive behavior
@@ -106,8 +107,7 @@ export default function RootLayout({
         />
       </head>
       <body
-        className="mx-4 sm:mx-8 md:mx-12 mt-4 sm:mt-6 md:mt-8 
-                   bg-background text-primary min-h-screen font-primary 
+        className="bg-background text-primary min-h-screen font-primary 
                    flex flex-col overflow-x-hidden relative
                    selection:bg-foreground-secondary/20"
       >
@@ -116,7 +116,7 @@ export default function RootLayout({
             <CursorProvider>
               <HeaderWrapper />
               <main>
-                {children}
+                <PageTransitionWrapper>{children}</PageTransitionWrapper>
                 <Analytics />
               </main>
               <Footer />

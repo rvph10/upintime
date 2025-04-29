@@ -187,7 +187,7 @@ const Footer = () => {
   };
 
   return (
-    <footer className="relative -mx-4 sm:-mx-8 md:-mx-12 bottom-0 px-4 sm:px-8 xs:px-6 py-12 sm:py-8 left-0 right-0 bg-foreground text-background">
+    <footer className="relative z-10 bottom-0 px-4 sm:px-8 xs:px-6 py-12 sm:py-8 left-0 right-0 bg-foreground text-background">
       <div className="mx-auto flex flex-col justify-center">
         {/* Upper section */}
         <div className="flex flex-col md:flex-row justify-between items-start gap-12 mb-6 md:mb-16 sm:mb-10">
