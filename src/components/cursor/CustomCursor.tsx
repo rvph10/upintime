@@ -152,7 +152,7 @@ const CustomCursor = ({
 
     // Target the actual anchor elements rendered by Next.js Link components
     const interactiveElements = document.querySelectorAll(
-      'a, button, input, select, textarea, [role="button"], [data-cursor-hover]',
+      'a, button, input, select, textarea, [role="button"], [data-cursor-hover]'
     );
 
     const handleMouseHoverStart = (e: Event) => {
@@ -200,7 +200,7 @@ const CustomCursor = ({
           "cursor-button",
           "cursor-link",
           "cursor-text",
-          "cursor-draggable",
+          "cursor-draggable"
         );
       }
     };
@@ -287,8 +287,11 @@ const CustomCursor = ({
 
         // Position the text label
         if (textRef.current) {
-          textRef.current.style.left = `${e.clientX}px`;
-          textRef.current.style.top = `${e.clientY + 30}px`;
+          const isLongText = cursorText.split(" ").length > 15;
+          const verticalOffset = 30; // Keep consistent vertical offset
+          const horizontalOffset = isLongText ? 20 : 0; // Only keep horizontal offset for long text
+          textRef.current.style.left = `${e.clientX + horizontalOffset}px`;
+          textRef.current.style.top = `${e.clientY + verticalOffset}px`;
         }
       } else {
         // Direct positioning for main cursor
@@ -305,8 +308,11 @@ const CustomCursor = ({
 
         // Position the text label
         if (textRef.current) {
-          textRef.current.style.left = `${e.clientX}px`;
-          textRef.current.style.top = `${e.clientY + 30}px`;
+          const isLongText = cursorText.split(" ").length > 15;
+          const verticalOffset = 30; // Keep consistent vertical offset
+          const horizontalOffset = isLongText ? 20 : 0; // Only keep horizontal offset for long text
+          textRef.current.style.left = `${e.clientX + horizontalOffset}px`;
+          textRef.current.style.top = `${e.clientY + verticalOffset}px`;
         }
       }
     };
@@ -403,7 +409,7 @@ const CustomCursor = ({
       // Clean up all event listeners from interactive elements
       document
         .querySelectorAll(
-          'a, button, input, select, textarea, [role="button"], [data-cursor-hover]',
+          'a, button, input, select, textarea, [role="button"], [data-cursor-hover]'
         )
         .forEach((element) => {
           const typedElement = element as HTMLElement & {
@@ -566,7 +572,16 @@ const CustomCursor = ({
             top: 0,
             left: 0,
             transform: "translate(-50%, 0)",
-            whiteSpace: "nowrap",
+            whiteSpace: cursorText.split(" ").length > 15 ? "normal" : "nowrap",
+            maxWidth: cursorText.split(" ").length > 15 ? "400px" : "none",
+            lineHeight: "1.2",
+            padding: "2px",
+            marginTop: "8px",
+            backgroundColor:
+              cursorText.split(" ").length > 15
+                ? "rgba(0, 0, 0, 0.8)"
+                : "transparent",
+            borderRadius: cursorText.split(" ").length > 15 ? "4px" : "0",
             opacity: 0,
           }}
         >
