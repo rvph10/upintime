@@ -195,7 +195,7 @@ const Footer = () => {
           <div className="flex flex-col gap-6 max-w-xl w-full">
             <h2
               ref={headingRef}
-              className="text-5xl sm:text-4xl xs:text-3xl font-light mb-12 sm:mb-8"
+              className="text-5xl lg:text-7xl font-light mb-12 sm:mb-8"
             >
               Make it happen.
             </h2>

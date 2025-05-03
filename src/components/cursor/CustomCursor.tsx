@@ -152,7 +152,7 @@ const CustomCursor = ({
 
     // Target the actual anchor elements rendered by Next.js Link components
     const interactiveElements = document.querySelectorAll(
-      'a, button, input, select, textarea, [role="button"], [data-cursor-hover]'
+      'a, button, input, select, textarea, [role="button"], [data-cursor-hover]',
     );
 
     const handleMouseHoverStart = (e: Event) => {
@@ -200,7 +200,7 @@ const CustomCursor = ({
           "cursor-button",
           "cursor-link",
           "cursor-text",
-          "cursor-draggable"
+          "cursor-draggable",
         );
       }
     };
@@ -409,7 +409,7 @@ const CustomCursor = ({
       // Clean up all event listeners from interactive elements
       document
         .querySelectorAll(
-          'a, button, input, select, textarea, [role="button"], [data-cursor-hover]'
+          'a, button, input, select, textarea, [role="button"], [data-cursor-hover]',
         )
         .forEach((element) => {
           const typedElement = element as HTMLElement & {
