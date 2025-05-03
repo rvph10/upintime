@@ -66,7 +66,7 @@ const FullscreenMenu = ({ isOpen, onLinkClick }: FullscreenMenuProps) => {
           duration: 1,
           clipPath: "polygon(49.75% 0%, 50.25% 0%, 50.25% 100%, 49.75% 100%)",
         },
-        "-=0.3",
+        "-=0.3"
       );
 
       tl.to(menuRef.current, {
@@ -82,7 +82,7 @@ const FullscreenMenu = ({ isOpen, onLinkClick }: FullscreenMenuProps) => {
           opacity: 1,
           duration: 0.6,
         },
-        "-=0.5",
+        "-=0.5"
       );
 
       setTimeline(tl);
@@ -103,7 +103,7 @@ const FullscreenMenu = ({ isOpen, onLinkClick }: FullscreenMenuProps) => {
       { name: "PROJECTS", href: "/projects" as Route },
       { name: "CONTACT", href: "/contact" as Route },
     ],
-    [],
+    []
   );
 
   // prefetch the pages
@@ -138,7 +138,7 @@ const FullscreenMenu = ({ isOpen, onLinkClick }: FullscreenMenuProps) => {
   // Handle link click with delayed navigation
   const handleLinkClick = (
     e: React.MouseEvent<HTMLAnchorElement>,
-    href: Route,
+    href: Route
   ) => {
     e.preventDefault();
 
@@ -152,15 +152,13 @@ const FullscreenMenu = ({ isOpen, onLinkClick }: FullscreenMenuProps) => {
     // Use our utility to start background loading and dispatch events
     startBackgroundPageLoad(href as string);
 
-    // Trigger menu closing first
+    // Navigate immediately
+    router.push(href);
+
+    // Trigger menu closing
     if (onLinkClick) {
       onLinkClick();
     }
-
-    // Wait for animation to complete before actual navigation
-    setTimeout(() => {
-      router.push(href);
-    }, 800); // Match this with the total animation duration
   };
 
   return (

@@ -1,10 +1,10 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import { gsap } from "gsap";
 import FullscreenMenu from "./FullscreenMenu";
 import { usePreloaderContext } from "@/components/preloader/PreloaderProvider";
+import TransitionLink from "../transition/TransitionLink";
 
 /**
  * HeaderWrapper component that only renders the Header when the preloader is done
@@ -109,7 +109,7 @@ function Header() {
       >
         {/* Logo */}
         <div ref={logoRef} className="opacity-0 relative z-[201]">
-          <Link
+          <TransitionLink
             href="/"
             data-cursor-hover
             data-cursor-text="Home"
@@ -123,7 +123,7 @@ function Header() {
               height={logoSize}
               priority
             />
-          </Link>
+          </TransitionLink>
         </div>
 
         {/* Menu toggle button */}
